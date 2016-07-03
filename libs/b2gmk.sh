@@ -1,4 +1,4 @@
-function koca_b2gmk {	# seconds to day hour min sec
+function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
 	w=$1
 	[ -z "$w" ] && read w
 	symbols=(o ko Mo Go To Po ) # Eo, Zo and Yo are too big. 'o' is for alignment
