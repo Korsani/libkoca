@@ -494,24 +494,51 @@ function koca_quotemeta { # Escape meta character
 	# Is it cheating ?
 	echo "$s" | perl  '-ple$_=quotemeta'
 }
-function s2dhms {	# seconds to day hour min sec
+function s2dhms {	# seconds to day hour min sec, of xx:xx:xx if -I. Return NaN or Oor if error
+	if [ "$1" == '-I' ]
+	then
+		FORMAT='I'
+		shift
+	else
+		FORMAT='S'
+	fi
 	w=$1
 	[ -z "$w" ] && read w
+	if ! [[ $w =~ ^[0-9]+$ ]]
+	then
+		echo 'NaN'
+		return
+	fi
+	if [ "$FORMAT" == "I" -a $w -ge 86400 ]
+	then
+		echo "OoR"
+		return
+	fi
 	dw=$(echo "$w/86400" | bc)   # Day Warning
-	sdw=$([ $dw -ne 0 ] && echo "${dw}d")    # String Day Warning
 	w=$(echo "$w%86400" | bc)
 	hw=$(echo "$w/3600" | bc)
-	shw=$([ $hw -ne 0 ] && echo "${hw}h")
 	w=$(echo "$w%3600" | bc)
 	mw=$(echo "$w/60" | bc)
-	smw=$([ $mw -ne 0 ] && echo "${mw}min")
-	# smw=`[ $mw -ne 0 ] && echo "${mw}min")
 	w=$(echo "$w%60" | bc)
-	sw=$([ $w -ne 0 ] && echo "${w}s")
+	case $FORMAT in
+		S) 
+			sdw=$([ $dw -ne 0 ] && echo "${dw}d")    # String Day Warning
+			shw=$([ $hw -ne 0 ] && echo "${hw}h")
+			smw=$([ $mw -ne 0 ] && echo "${mw}min")
+			sw=$([ $w -ne 0 ] && echo "${w}s")
+			z_tot='0s'
+			;;
+		I)
+			shw=$(printf "%02d:" ${hw})
+			smw=$(printf "%02d:" ${mw})
+			sw=$(printf "%02d" ${w})
+			z_tot='00:00:00'
+			;;
+	esac
 	tot=${sdw}${shw}${smw}${sw}
 	if [ -z "$tot" ]
 	then
-		echo 0s
+		echo $z_tot
 	else
 		echo $tot
 	fi
@@ -591,4 +618,4 @@ do
 	shift
 done
 )
-# built on 2016-07-03
+# built on 2016-07-11
