@@ -22,5 +22,17 @@ tests2dhms()  {
 	assertEquals "Seconds badly parsed" "1min1s" "$d"
 	d=$(echo 61 | s2dhms)
 	assertEquals "dhms doesn't accept dat on standard input" "1min1s" "$d"
+	d=$(echo 61 | s2dhms -I)
+	assertEquals "dhms does not display in international format" "00:01:01" "$d"
+	d=$(s2dhms -I 61)
+	assertEquals "dhms does not display in international format" "00:01:01" "$d"
+	d=$(s2dhms plop)
+	assertEquals "not a number" "NaN" "$d"
+	d=$(s2dhms 99p)
+	assertEquals "not a number" "NaN" "$d"
+	d=$(s2dhms -I 86400)
+	assertEquals "out of range" "OoR" "$d"
+	d=$(s2dhms -I 0)
+	assertEquals "Not 00:00:00" "00:00:00" "$d"
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh
