@@ -14,7 +14,7 @@ testGetconfReturnCorrectValues() {
 	assertTrue "getConfValue doesn't return true" "$ret"
 }
 testGetconfReturnFalseonUnfoundConfFile() {
-	val=$(conf=/etc/gna getConfValue plop plop 2>&1)
+	val=$(KOCA_CONF=/etc/gna getConfValue plop plop 2>&1)
 	ret=$?
 	assertFalse "getConfValue doesn't return false ($ret)" "$ret"
 	assertEquals "getConfValue doesn't return 1 (was $ret)" "1" "$ret"
@@ -67,14 +67,12 @@ testGetconfReturneLastKeyOnDoubleKeys() {
 	assertEquals "getConfValue doesn't return correct value $val" "plop=one" "$val"
 }
 testGetconfReturnFalseIfConfVarNotProvided() {
-	#export conf=''
-	val=$(conf="" getConfValue plop gna 2>/dev/null)
+	val=$(KOCA_CONF="" getConfValue plop gna 2>/dev/null)
 	ret=$?
 	assertEquals "getConfValue should return 1" "1" "$ret"
 }
 testGetconfReturnFalseIfConfFileDoesntExists() {
-	#export conf=$RANDOM
-	val=$(conf=$RANDOM getConfValue plop gna 2>/dev/null)
+	val=$(KOCA_CONF=$RANDOM getConfValue plop gna 2>/dev/null)
 	ret=$?
 	assertEquals "getConfValue should return 1" "1" "$ret"
 }
@@ -90,7 +88,7 @@ testGetconfReturnAllTheIndexOfASection() {
 	echo 'com.ssh1=one' > $KOCA_CONF
 	echo 'com.ssh2=one' >> $KOCA_CONF
 	echo 'com.ssh3=one' >> /tmp/1
-	val=$(conf="$KOCA_CONF /tmp/1" getConfAllKeys com)
+	val=$(KOCA_CONF="$KOCA_CONF /tmp/1" getConfAllKeys com)
 	ret=$?
 	assertEquals "Not all values have been returned" "ssh1 ssh2 ssh3" "$val"
 	rm -f /tmp/1
@@ -103,7 +101,7 @@ testGetconfReturnAllTheSections() {
 	echo '# toupidou.plop=one' >> $KOCA_CONF
 	echo ' # toupidou.plop=one' >> $KOCA_CONF
 	echo '  # toupidou.plop=one' >> $KOCA_CONF
-	sections=`conf="$KOCA_CONF /tmp/1" getConfAllSections`
+	sections=`KOCA_CONF="$KOCA_CONF /tmp/1" getConfAllSections`
 	ret=$?
 	assertEquals "Not all sections have been returned" "com1 com2 com3" "$sections"
 	rm -f /tmp/1
@@ -117,7 +115,7 @@ testGetconfCorrectlyHandleStars() {
 }
 testGetconfCorrectlyHandleThirdParameter() {
 	echo 'a.b=2' > $KOCA_CONF
-	v=$(conf=$KOCA_CONF getConfValue a c 1)
+	v=$(KOCA_CONF=$KOCA_CONF getConfValue a c 1)
 	ret=$?
 	assertEquals "Do not correctly handle third parameter" '1' "$v"
 	rm -f $KOCA_CONF
@@ -127,9 +125,9 @@ testGetconfReturnAllSectionsOfProvidedKey() {
 	echo 's2.k=2' >>$KOCA_CONF
 	echo 's3.kk=2' >>$KOCA_CONF
 	echo 's4.a-k=2' >>$KOCA_CONF
-	v=$(conf=$KOCA_CONF getConfAllSections k)
+	v=$(KOCA_CONF=$KOCA_CONF getConfAllSections k)
 	assertEquals "Ploup" 's1 s2' "$v"
-	v=$(conf=$KOCA_CONF getConfAllSections k kk)
+	v=$(KOCA_CONF=$KOCA_CONF getConfAllSections k kk)
 	assertEquals "Ploup" 's1 s2 s3' "$v"
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh
