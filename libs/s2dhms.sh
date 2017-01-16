@@ -10,12 +10,12 @@ function s2dhms {	# seconds to day hour min sec, of xx:xx:xx if -I. Return NaN o
 	[ -z "$w" ] && read w
 	if ! [[ $w =~ ^[0-9]+$ ]]
 	then
-		echo 'NaN'
+		echo '    NaN    '
 		return
 	fi
-	if [ "$FORMAT" == "I" -a $w -ge 86400 ]
+	if [ "$FORMAT" == "I" -a $w -ge 864000 ]
 	then
-		echo "OoR"
+		echo '    OoR    '
 		return
 	fi
 	dw=$(echo "$w/86400" | bc)   # Day Warning
@@ -33,6 +33,7 @@ function s2dhms {	# seconds to day hour min sec, of xx:xx:xx if -I. Return NaN o
 			z_tot='0s'
 			;;
 		I)
+			sdw=$(printf "%02d:" ${dw})
 			shw=$(printf "%02d:" ${hw})
 			smw=$(printf "%02d:" ${mw})
 			sw=$(printf "%02d" ${w})
