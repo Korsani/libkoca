@@ -2,6 +2,9 @@
 # $Id: aacore.sh 1128 2012-08-31 15:44:45Z gab $
 source $(cd $(dirname "$0") ; pwd)/bootstrap.sh
 source $here/../libs/lockMe.sh
+setUp() {
+	cat $here/../libs/aacore.sh $here/../libs/lockMe.sh $here/../libs/cleanOnExit.sh $here/../libs/zzfooter.sh | sed -e 's/__libname__/libkoca.sh/' > $here/../libkoca.sh
+}
 testLibkocaExitWith0WhenRan() {
 	bash $here/../libs/aacore.sh >/dev/null ; r=$?
 	assertTrue "libkoca didn't return true" "$r"

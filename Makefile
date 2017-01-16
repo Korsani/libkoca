@@ -10,13 +10,22 @@ PREFIX=/usr/local/include
 FN=libkoca.sh
 FNMODE=0644
 WWW_DIR:=/var/www/files
+LIBS:=$(wildcard libs/*.sh)
+TESTS:=$(addprefix t/,$(notdir $(LIBS)))
+OUT:=$(addprefix out/,$(notdir $(LIBS)))
 
-.PHONY : version libkoca.sh
+.PHONY : version 
+.DEFAULT_GOAL := libkoca.sh 
 
-libkoca.sh: make.sh libs/*.sh
-	./make.sh $@
+
+libkoca.sh: $(OUT)
+	cat $(OUT) | sed -e 's/__libname__/libkoca.sh/' > $@
+
+$(OUT): out/%.sh: t/%.sh
+	bash $< && cp libs/$(notdir $<) $@
 
 clean: bclean dclean
+	rm -f $(OUT)
 
 version:
 	@bash $(FN) version
