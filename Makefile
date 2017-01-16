@@ -4,25 +4,25 @@ CATEGORY=autre
 DISTNAME=shlibkoca
 VERSIONFROM=make version
 DESCRIPTION='Useful shell functions'
-MAKEFLAGS += --no-print-directory
+MAKEFLAGS += --no-print-directory --silent
 
 PREFIX=/usr/local/include
 FN=libkoca.sh
 FNMODE=0644
 WWW_DIR:=/var/www/files
 LIBS:=$(wildcard libs/*.sh)
-TESTS:=$(addprefix t/,$(notdir $(LIBS)))
 OUT:=$(addprefix out/,$(notdir $(LIBS)))
 
 .PHONY : version 
-.DEFAULT_GOAL := libkoca.sh 
+.DEFAULT_GOAL := $(FN)
 
 
-libkoca.sh: $(OUT)
-	cat $(OUT) | sed -e 's/__libname__/libkoca.sh/' > $@
+$(FN): $(OUT)
+	cat $(OUT) | sed -e "s/__libname__/$(FN)/" > $@
 
 $(OUT): out/%.sh: t/%.sh
-	bash $< && cp libs/$(notdir $<) $@
+	echo -n "$< ? "
+	bash $< >/dev/null && cp libs/$(notdir $<) $@ && echo OK
 
 clean: bclean dclean
 	rm -f $(OUT)
@@ -32,21 +32,21 @@ version:
 
 ifneq "" "$(shell getent passwd www-data)"
 ifneq "" "$(wildcard /var/www/files)"
-install: $(PREFIX)/libkoca.sh $(WWW_DIR)/libkoca.sh
+install: $(PREFIX)/$(FN) $(WWW_DIR)/$(FN)
 else
-install: $(PREFIX)/libkoca.sh
+install: $(PREFIX)/$(FN)
 endif
 else
-install: $(PREFIX)/libkoca.sh
+install: $(PREFIX)/$(FN)
 endif
 
-$(PREFIX)/libkoca.sh: libkoca.sh
+$(PREFIX)/$(FN): $(FN)
 	install -D -m0644 $< $@
 	rm -f $(PREFIX)/commun.sh
 	echo 'echo "Unused" >&2' > $(PREFIX)/commun.sh
 
 # If dest file has to be installed in /var/www/files, it should exists BEFORE, as I won't create it
-$(WWW_DIR)/libkoca.sh: libkoca.sh /var/www/files
+$(WWW_DIR)/$(FN): $(FN) /var/www/files
 	install -o www-data -m0644 $< $@
 
 -include commun.mk
