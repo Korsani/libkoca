@@ -44,6 +44,7 @@ $(PREFIX)/$(FN): $(FN)
 	install -D -m0644 $< $@
 	rm -f $(PREFIX)/commun.sh
 	echo 'echo "Unused" >&2' > $(PREFIX)/commun.sh
+	$(info Installed in $(PREFIX))
 
 # If dest file has to be installed in /var/www/files, it should exists BEFORE, as I won't create it
 $(WWW_DIR)/$(FN): $(FN) /var/www/files
