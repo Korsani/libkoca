@@ -10,9 +10,10 @@ PREFIX=/usr/local/include
 FN=libkoca.sh
 FNMODE=0644
 WWW_DIR:=/var/www/files
-LIBS:=$(wildcard libs/*.sh)
+LIBS:=$(sort $(wildcard libs/*.sh))
 OUT:=$(addprefix out/,$(notdir $(LIBS)))
 
+$(info $(LIBS))
 .PHONY : version 
 .DEFAULT_GOAL := $(FN)
 
