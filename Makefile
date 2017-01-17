@@ -19,6 +19,7 @@ OUT:=$(addprefix out/,$(notdir $(LIBS)))
 
 $(FN): $(OUT)
 	cat $(OUT) | sed -e "s/__libname__/$(FN)/" > $@
+	$(info $@ built)
 
 $(OUT): out/%.sh: t/%.sh
 	echo -n "$< ? "
