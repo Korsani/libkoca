@@ -1,7 +1,7 @@
 function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
 	w=$1
 	[ -z "$w" ] && read w
-	symbols=(o ko Mo Go To Po ) # Eo, Zo and Yo are too big. 'o' is for alignment
+	symbols=(. k M G T P ) # Eo, Zo and Yo are too big. 'o' is for alignment
 	for i in $(seq ${#symbols[*]})
 	do
 		values[$i]=$(echo 1024^$i|bc)
@@ -16,5 +16,5 @@ function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
 		w=$(echo "scale=0;$w%${values[$i]}" | bc)
 	done
 
-	echo "${w}o"
+	echo "${w}"
 }
