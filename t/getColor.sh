@@ -9,14 +9,14 @@ testGetColorReturnACode() {
 	unset a
 	allcolors=$(getColor list| grep '#' | cut -d ' ' -f 2)
 	#local code=$(tput el1)$(tput cr)
-	local r=$(tput sgr0)
+	local r=$(tput setaf 9)$(tput setab 9)
 	for c in $allcolors
 	do
 		getColor a $c
 		echo -n "$code$a$c$r "
 		assertNotEquals "GetColor $c returned an empty string" "" "$a"
 	done
-	echo $(tput sgr0)
+	echo $r
 }
 testGetColorReturnAugmentedVar() {
 	a=a
@@ -33,13 +33,13 @@ testGetColorReturnClearedVar() {
 testGetColorReturnAugmentedVarDoubleColored() {
 	a=a
 	getColor a+ red reset
-	b=$"$(tput setaf 1)$(echo -e "\033[0m")"
+	b=$"$(tput setaf 1)"$(tput setaf 9)$(tput setab 9)
 	assertEquals "GetColor failed to return previous variable double colored" "a$b" "$a"
 }
 testGetColorReturnCleanVarDoubleColored() {
 	a=a
 	getColor a red reset
-	b=$"$(tput setaf 1)"$(echo -e "\033[0m")
+	b=$"$(tput setaf 1)"$(tput setaf 9)$(tput setab 9)
 	assertEquals "GetColor failed to return a clean variable when double colored " "$b" "$a"
 }
 testGetColorWorksEvenIfItsC() {

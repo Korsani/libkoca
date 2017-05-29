@@ -13,27 +13,38 @@ function getColor { # Return a specified color code in a specified var
 	then
 		return
 	fi
+	# For almost every uname...
+	tput_af="setaf"
+	tput_ab="setab"
+	bold=bold
+	# but FreeBSD doesn't use terminfo
+	if [ "$(uname)" = "FreeBSD" ]
+	then
+		tput_af=AF
+		tput_ab=AB
+		bold=md
+	fi
 	function _getColor {
 	alias echo="echo -n"
-	local _bold=$(tput bold)
+	local _bold=$(tput $bold)
 		case $1 in 
-			black) echo $(tput setaf 0);;
-			red) echo $(tput setaf 1) ;;
-			green) echo $(tput setaf 2) ;;
-			brown) echo $(tput setaf 3) ;;
-			blue) echo $(tput setaf 4) ;;
-			purple) echo $(tput setaf 5) ;;
-			cyan) echo $(tput setaf 6) ;;
-			gray) echo $(tput setaf 7) ;;
+			black) echo $(tput $tput_af 0);;
+			red) echo $(tput $tput_af 1) ;;
+			green) echo $(tput $tput_af 2) ;;
+			brown) echo $(tput $tput_af 3) ;;
+			blue) echo $(tput $tput_af 4) ;;
+			purple) echo $(tput $tput_af 5) ;;
+			cyan) echo $(tput $tput_af 6) ;;
+			gray) echo $(tput $tput_af 7) ;;
 
-			bgblack) echo $(tput setab 0);;
-			bgred) echo $(tput setab 1) ;;
-			bggreen) echo $(tput setab 2) ;;
-			bgyellow) echo $(tput setab 3) ;;
-			bgblue) echo $(tput setab 4) ;;
-			bgpurple) echo $(tput setab 5) ;;
-			bgcyan) echo $(tput setab 6) ;;
-			bgwhite) echo $(tput setab 7) ;;
+			bgblack) echo $(tput $tput_ab 0);;
+			bgred) echo $(tput $tput_ab 1) ;;
+			bggreen) echo $(tput $tput_ab 2) ;;
+			bgyellow) echo $(tput $tput_ab 3) ;;
+			bgblue) echo $(tput $tput_ab 4) ;;
+			bgpurple) echo $(tput $tput_ab 5) ;;
+			bgcyan) echo $(tput $tput_ab 6) ;;
+			bgwhite) echo $(tput $tput_ab 7) ;;
 
 			hiblack) echo $_bold$(_getColor black) ;;
 			hired) echo $_bold$(_getColor red) ;;
@@ -45,9 +56,7 @@ function getColor { # Return a specified color code in a specified var
 			white) echo $_bold$(_getColor gray) ;;
 
 			bold) echo $_bold ;;
-			# don't ask me why ...
-			#reset) echo "$(tput sgr0)" ;;
-			reset) echo -e "\033[0m";;
+			reset) echo $(tput $tput_af 9)$(tput $tput_ab 9) ;;
 		esac
 		unalias echo
 	}
@@ -59,7 +68,7 @@ function getColor { # Return a specified color code in a specified var
 
 	if [ "$1" == "list" ]
 	then
-		local r=$(tput sgr0)
+		local r=$(_getColor reset)
 		local i
 		for i in $allcolors
 		do
