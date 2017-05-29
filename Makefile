@@ -21,9 +21,9 @@ $(FN): $(OUT)
 	cat $(OUT) | sed -e "s/__libname__/$(FN)/" > $@
 	$(info $@ built)
 
-$(OUT): out/%.sh: t/%.sh
-	echo -n "$< ? "
-	bash $< >/dev/null && cp libs/$(notdir $<) $@ && echo OK
+$(OUT): out/%.sh: libs/%.sh
+	echo -n "Testing $< ... "
+	bash $(subst libs,t,$<) >/dev/null && cp libs/$(notdir $<) $@ && echo OK
 
 clean: bclean dclean
 	rm -f $(OUT)
