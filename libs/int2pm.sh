@@ -1,5 +1,5 @@
-# Return color code in a specified var
-function int2pm { # return +, ++, +++ (or -)
+# Return the number converted in +/- scale
+function int2pm { # return +, ++, +++ (or -). <val> <base>
 	local val="$1"
 	local base="$2"
 	local SCALE=3
