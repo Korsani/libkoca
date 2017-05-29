@@ -14,6 +14,7 @@ testReturnGoodResults() {
 	assertEquals "Zero" "~" "$(int2pm 0 1)"
 	assertEquals "++++" "++++" "$(int2pm 100 100 4)"
 	assertEquals "pppp" "pppp" "$(int2pm 100 100 4 pm)"
+	assertEquals "+---------" "+---------" "$(int2pm 9 100 10 +- gauge)"
 }
 testReturnFalseOnBadParams() {
 	assertFalse "Should have returned false" $(int2pm a 10)

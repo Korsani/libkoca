@@ -1,17 +1,13 @@
 # Return the number converted in +/- scale
-function int2pm { # return +, ++, +++ (or -). <val> <base> [ <scale> [ <sign+><sign-> ] ] 
+function int2pm { # return +, ++, +++ (or -). <val> <base> [ <scale> [ <sign+><sign-> [ "gauge" ] ] ] 
 	local val="$1"
 	local base="$2"
 	local SCALE=3
 	local SIGNS='+-'
-	if [ -n "$3" ]
-	then
-		SCALE="$3"
-	fi
-	if [ -n "$4" ]
-	then
-		SIGNS="$4"
-	fi
+	[ -n "$3" ] && SCALE="$3"
+	[ -n "$4" ] && SIGNS="$4"
+	[ "$5" = "gauge" ] && MIXED="y"
+	
 	if ! ( [[ $base =~ ^[0-9]+$ ]] && [[ $val =~ ^-?[0-9]+$ ]] && [[ $SCALE =~ ^[0-9]+$ ]])
 	then
 		echo "Params should be integers" >&2
@@ -40,9 +36,14 @@ function int2pm { # return +, ++, +++ (or -). <val> <base> [ <scale> [ <sign+><s
 	fi
 	if [ $val -eq 0 ]
 	then
-		echo '~'
+		r='~'
 	else
 		# Weird ?
-		printf "%0.s$sign" {$(seq 1 $(echo "scale=0;1+$val/($base/$SCALE)*$val/sqrt($val^2)" | bc ))}
+		r=$(printf "%0.s$sign" {$(seq 1 $(echo "scale=0;1+$val/($base/$SCALE)*$val/sqrt($val^2)" | bc ))})
+		if [ -n "$MIXED" ]
+		then
+			r+=$(printf "%0.s${SIGNS:1:1}" {$(seq 1 $(echo "scale=0;($base-$val)/($base/$SCALE)*$val/sqrt($val^2)" | bc ))})
+		fi
 	fi
+	echo $r
 }
