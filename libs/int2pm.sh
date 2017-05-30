@@ -1,12 +1,12 @@
 # Return the number converted in +/- scale
-function int2pm { # return +, ++, +++ (or -). <val> <base> [ <scale> [ <sign+><sign-> [ "gauge" ] ] ] 
+function int2pm { # return +, ++, +++ (or -). <val> <base> [ <scale> [ gauge [ <sign+><sign-> ] ] ] 
 	local val="$1"
 	local base="$2"
 	local SCALE=3
 	local SIGNS='+-'
+	[ -n "$5" ] && SIGNS="$5"
 	[ -n "$3" ] && SCALE="$3"
-	[ -n "$4" ] && SIGNS="$4"
-	[ "$5" = "gauge" ] && MIXED="y"
+	[ "$4" = "gauge" ] && MIXED="y"
 	
 	if ! ( [[ $base =~ ^[0-9]+$ ]] && [[ $val =~ ^-?[0-9]+$ ]] && [[ $SCALE =~ ^[0-9]+$ ]])
 	then
@@ -21,6 +21,11 @@ function int2pm { # return +, ++, +++ (or -). <val> <base> [ <scale> [ <sign+><s
 	if [ $base -lt $val ]
 	then
 		echo "Base should be greater than value" >&2
+		return 2
+	fi
+	if [ $SCALE -gt $base ]
+	then
+		echo "Scale should be less than base" >&2
 		return 2
 	fi
 	if [ $val -lt 0 ]
@@ -39,10 +44,14 @@ function int2pm { # return +, ++, +++ (or -). <val> <base> [ <scale> [ <sign+><s
 		r='~'
 	else
 		# Weird ?
-		r=$(printf "%0.s$sign" {$(seq 1 $(echo "scale=0;1+$val/($base/$SCALE)*$val/sqrt($val^2)" | bc ))})
+		n=$(echo "scale=0;r=1+$val/($base/$SCALE)*$val/sqrt($val^2);if (r>$SCALE) print $SCALE else print r" | bc )
+		r=$(printf "%0.s$sign" {$(seq 1 $(echo "scale=0;r=1+$val/($base/$SCALE)*$val/sqrt($val^2);if (r>$SCALE) print $SCALE else print r" | bc ))})
 		if [ -n "$MIXED" ]
 		then
-			r+=$(printf "%0.s${SIGNS:1:1}" {$(seq 1 $(echo "scale=0;($base-$val)/($base/$SCALE)*$val/sqrt($val^2)" | bc ))})
+			if [ $n -ne $SCALE ]
+			then
+				r+=$(printf "%0.s${SIGNS:1:1}" {$(seq $((n+1)) $SCALE)})
+			fi
 		fi
 	fi
 	echo $r

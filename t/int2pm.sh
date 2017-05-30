@@ -11,15 +11,16 @@ testReturnGoodResults() {
 	assertEquals "-34--" "--" "$(int2pm -34 100)"
 	assertEquals "-32-" "-" "$(int2pm -32 100)"
 	assertEquals "-10-" "-" "$(int2pm -10 100)"
-	assertEquals "Zero" "~" "$(int2pm 0 1)"
+	assertEquals "Zero" "~" "$(int2pm 0 10)"
 	assertEquals "++++" "++++" "$(int2pm 100 100 4)"
-	assertEquals "pppp" "pppp" "$(int2pm 100 100 4 pm)"
-	assertEquals "+---------" "+---------" "$(int2pm 9 100 10 +- gauge)"
+	assertEquals "pppp" "pppp" "$(int2pm 100 100 4 "" pm)"
+	assertEquals "+---------" "+---------" "$(int2pm 9 100 10 gauge)"
 }
 testReturnFalseOnBadParams() {
 	assertFalse "Should have returned false" $(int2pm a 10)
 	assertFalse "Should have returned false" $(int2pm 10 a)
 	assertFalse "Base should be greater thant value" $(int2pm 100 10)
 	assertFalse "Base should be >0" $(int2pm 100 -10)
+	assertFalse "Scale should be < base " $(int2pm 1 3 4)
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh
