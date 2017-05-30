@@ -1,5 +1,11 @@
 function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
-	w=$1
+	w="$1"
+	if ! [[ $w =~ ^[0-9]+$ ]]
+	then
+		echo "[${FUNCNAME[0]}] Parameter should be an integer" >&2
+		return 1
+	fi
+
 	[ -z "$w" ] && read w
 	symbols=(. k M G T P ) # Eo, Zo and Yo are too big. 'o' is for alignment
 	for i in $(seq ${#symbols[*]})
