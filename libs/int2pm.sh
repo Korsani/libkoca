@@ -1,5 +1,5 @@
 # Return the number converted in +/- scale
-function int2pm { # return +, ++, +++ (or -). <val> <base> [ <scale> [ gauge [ <sign+><sign-> ] ] ] 
+function koca_int2pm { # return +, ++, +++ (or -). <val> <base> [ <scale> [ gauge [ <sign+><sign-> ] ] ] 
 	local val="$1"
 	local base="$2"
 	local SCALE=3
@@ -10,27 +10,27 @@ function int2pm { # return +, ++, +++ (or -). <val> <base> [ <scale> [ gauge [ <
 	
 	if ! ( [[ $base =~ ^[0-9]+$ ]] && [[ $val =~ ^-?[0-9]+$ ]] && [[ $SCALE =~ ^[0-9]+$ ]])
 	then
-		echo "Params should be integers" >&2
+		echo "[${FUNCNAME[0]}] Params should be integers" >&2
 		return 1
 	fi
 	if [ $base -lt 0 ]
 	then
-		echo "Base should be positive" >&2
+		echo "[${FUNCNAME[0]}] Base should be positive" >&2
 		return 3
 	fi
 	if [ -n "$MIXED" -a $val -lt 0 ]
 	then
-		echo "Val must be positive when using gauge" >&2
+		echo "[${FUNCNAME[0]}] Value must be positive when using gauge" >&2
 		return 3
 	fi
 	if [ $base -lt $val ]
 	then
-		echo "Base should be greater than value" >&2
+		echo "[${FUNCNAME[0]}] Base should be greater than value" >&2
 		return 2
 	fi
 	if [ $SCALE -gt $base ]
 	then
-		echo "Scale should be less than base" >&2
+		echo "[${FUNCNAME[0]}] Scale should be less than base" >&2
 		return 2
 	fi
 	if [ $val -lt 0 ]
