@@ -18,6 +18,11 @@ function int2pm { # return +, ++, +++ (or -). <val> <base> [ <scale> [ gauge [ <
 		echo "Base should be positive" >&2
 		return 3
 	fi
+	if [ -n "$MIXED" -a $val -lt 0 ]
+	then
+		echo "Val must be positive when using gauge" >&2
+		return 3
+	fi
 	if [ $base -lt $val ]
 	then
 		echo "Base should be greater than value" >&2
