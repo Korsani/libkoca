@@ -21,6 +21,6 @@ testB2K() {
 	assertEquals 0 $(koca_b2gmk 0)
 }
 testFalse() {
-	assertFalse 'N/A' $(koca_b2gmk 'N/A') 2>/dev/null
+	assertEquals '?' "$(koca_b2gmk 'N/A')"
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh

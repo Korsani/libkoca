@@ -1,8 +1,8 @@
 function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
 	w="$1"
-	if ! [[ $w =~ ^[0-9]+$ ]]
+	if ! [[ "$w" =~ ^[0-9]+$ ]]
 	then
-		echo "[${FUNCNAME[0]}] Parameter should be an integer" >&2
+		echo '?'
 		return 1
 	fi
 
