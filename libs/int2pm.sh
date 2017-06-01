@@ -16,24 +16,24 @@ function koca_int2pm { # return +, ++, +++ (or -). <value> [ <max> [ <length> [ 
 	fi
 	if [ $MAX -lt 0 ]
 	then
-		echo "[${FUNCNAME[0]}] Base should be positive" >&2
+		echo "[${FUNCNAME[0]}] Max ($MAX) should be positive" >&2
 		return 3
 	fi
 	if [ -n "$GAUGE" -a $val -lt 0 ]
 	then
-		echo "[${FUNCNAME[0]}] Value must be positive when using gauge" >&2
+		echo "[${FUNCNAME[0]}] Value ($val) must be positive when using gauge" >&2
 		return 3
 	fi
 	if [ $MAX -lt $val ]
 	then
-		echo "[${FUNCNAME[0]}] Base should be greater than value" >&2
+		echo "[${FUNCNAME[0]}] Max ($MAX) should be greater than value ($val)" >&2
 		return 2
 	fi
-	if [ $LENGTH -gt $MAX ]
-	then
-		echo "[${FUNCNAME[0]}] Scale should be less than MAX" >&2
-		return 2
-	fi
+#	if [ $LENGTH -gt $MAX ]
+#	then
+#		echo "[${FUNCNAME[0]}] Length ($LENGTH) should be less than max ($MAX)" >&2
+#		return 2
+#	fi
 	if [ $val -lt 0 ]
 	then
 		sign=${SIGNS:1:1}
