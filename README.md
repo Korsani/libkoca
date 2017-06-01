@@ -18,3 +18,19 @@ Featuring
 * Dynamic building : if a function do not pass the tests, it is not included in the final file.
 * Executable library : 'sh libkoca.sh' display helps. 'sh libkoca.sh listi' display the lists of functions
 * You only want the lockMe function ? do 'eval "$(libkoca.sh lockMe)"' and you'll have only this function in the name space of your script.
+
+koca_int2pm
+	Display a number in +/++/+++ notation. And a bit more
+
+Usage :
+	koca_int2pm <value> <max> [ <length=3> [ 'gauge' [ <sign+><sign-> ] ] ] 
+
+Example:
+	koca_int2pm 1 : +
+	koca_int2pm -1 : +
+	koca_int2pm 3 10 : +
+	koca_int2pm 3 10 10 : +++
+	koca_int2pm 10 10 10 : ++++++++++
+	koca_int2pm -5 10 10 : -----
+	koca_int2pm 1 10 10 gauge : +---------
+	koca_int2pm 1 10 10 gauge '><' : ><<<<<<<<<
