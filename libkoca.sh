@@ -6,7 +6,13 @@ _outdated() {
     eval alias $1="\"echo '[libkoca.sh] Please use koca_$1, instead of $1'; koca_$1\""
 }
 function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
-	w=$1
+	w="$1"
+	if ! [[ "$w" =~ ^[0-9]+$ ]]
+	then
+		echo '?'
+		return 1
+	fi
+
 	[ -z "$w" ] && read w
 	symbols=(. k M G T P ) # Eo, Zo and Yo are too big. 'o' is for alignment
 	for i in $(seq ${#symbols[*]})
@@ -171,27 +177,38 @@ function getColor { # Return a specified color code in a specified var
 	then
 		return
 	fi
+	# For almost every uname...
+	tput_af="setaf"
+	tput_ab="setab"
+	bold=bold
+	# but FreeBSD doesn't use terminfo
+	if [ "$(uname)" = "FreeBSD" ]
+	then
+		tput_af=AF
+		tput_ab=AB
+		bold=md
+	fi
 	function _getColor {
 	alias echo="echo -n"
-	local _bold=$(tput bold)
+	local _bold=$(tput $bold)
 		case $1 in 
-			black) echo $(tput setaf 0);;
-			red) echo $(tput setaf 1) ;;
-			green) echo $(tput setaf 2) ;;
-			brown) echo $(tput setaf 3) ;;
-			blue) echo $(tput setaf 4) ;;
-			purple) echo $(tput setaf 5) ;;
-			cyan) echo $(tput setaf 6) ;;
-			gray) echo $(tput setaf 7) ;;
+			black) echo $(tput $tput_af 0);;
+			red) echo $(tput $tput_af 1) ;;
+			green) echo $(tput $tput_af 2) ;;
+			brown) echo $(tput $tput_af 3) ;;
+			blue) echo $(tput $tput_af 4) ;;
+			purple) echo $(tput $tput_af 5) ;;
+			cyan) echo $(tput $tput_af 6) ;;
+			gray) echo $(tput $tput_af 7) ;;
 
-			bgblack) echo $(tput setab 0);;
-			bgred) echo $(tput setab 1) ;;
-			bggreen) echo $(tput setab 2) ;;
-			bgyellow) echo $(tput setab 3) ;;
-			bgblue) echo $(tput setab 4) ;;
-			bgpurple) echo $(tput setab 5) ;;
-			bgcyan) echo $(tput setab 6) ;;
-			bgwhite) echo $(tput setab 7) ;;
+			bgblack) echo $(tput $tput_ab 0);;
+			bgred) echo $(tput $tput_ab 1) ;;
+			bggreen) echo $(tput $tput_ab 2) ;;
+			bgyellow) echo $(tput $tput_ab 3) ;;
+			bgblue) echo $(tput $tput_ab 4) ;;
+			bgpurple) echo $(tput $tput_ab 5) ;;
+			bgcyan) echo $(tput $tput_ab 6) ;;
+			bgwhite) echo $(tput $tput_ab 7) ;;
 
 			hiblack) echo $_bold$(_getColor black) ;;
 			hired) echo $_bold$(_getColor red) ;;
@@ -203,9 +220,7 @@ function getColor { # Return a specified color code in a specified var
 			white) echo $_bold$(_getColor gray) ;;
 
 			bold) echo $_bold ;;
-			# don't ask me why ...
-			#reset) echo "$(tput sgr0)" ;;
-			reset) echo -e "\033[0m";;
+			reset) echo $(tput $tput_af 9)$(tput $tput_ab 9) ;;
 		esac
 		unalias echo
 	}
@@ -217,7 +232,7 @@ function getColor { # Return a specified color code in a specified var
 
 	if [ "$1" == "list" ]
 	then
-		local r=$(tput sgr0)
+		local r=$(_getColor reset)
 		local i
 		for i in $allcolors
 		do
@@ -362,6 +377,78 @@ function getConfAllSections {
 		done
     fi
 	echo $v
+}
+# Return the number converted in +/- scale
+function koca_int2pm { # return +, ++, +++ (or -). <value> [ <max> [ <length> [ 'gauge' [ <sign+><sign-> ] ] ] ]
+	local val="$1"
+	local MAX=3
+	local LENGTH=3
+	local SIGNS='+-'
+	[ -n "$5" ] && SIGNS="$5"
+	[ -n "$3" ] && LENGTH="$3"
+	[ -n "$2" ] && MAX="$2"
+	[ "$4" = "gauge" ] && GAUGE="y"
+	
+	if ! ( [[ $MAX =~ ^[0-9]+$ ]] && [[ $val =~ ^-?[0-9]+$ ]] && [[ $LENGTH =~ ^[0-9]+$ ]])
+	then
+		echo "[${FUNCNAME[0]}] Params should be integers" >&2
+		return 1
+	fi
+	if [ $MAX -lt 0 ]
+	then
+		echo "[${FUNCNAME[0]}] Max ($MAX) should be positive" >&2
+		return 3
+	fi
+	if [ -n "$GAUGE" -a $val -lt 0 ]
+	then
+		echo "[${FUNCNAME[0]}] Value ($val) must be positive when using gauge" >&2
+		return 3
+	fi
+	if [ $MAX -lt $val ]
+	then
+		echo "[${FUNCNAME[0]}] Max ($MAX) should be greater than value ($val)" >&2
+		return 2
+	fi
+#	if [ $LENGTH -gt $MAX ]
+#	then
+#		echo "[${FUNCNAME[0]}] Length ($LENGTH) should be less than max ($MAX)" >&2
+#		return 2
+#	fi
+	if [ $val -lt 0 ]
+	then
+		sign=${SIGNS:1:1}
+	else
+		sign=${SIGNS:0:1}
+	fi
+	if [ $val -eq $MAX ]
+	then
+		printf "%0.s$sign" {$(seq 1 $LENGTH)}
+		echo
+		return 0
+	fi
+	if [ $val -eq 0 ]
+	then
+		r='~'
+	else
+		# Weird ?
+		n=$(echo "scale=2;r=$val/($MAX/$LENGTH)*$val/sqrt($val^2); if (r>$LENGTH) r=$LENGTH; r" | bc )
+		# Fucking bc that is not able to say me wether a number is integer or not ...
+		if [[ $n =~ .00$ ]]
+		then
+			n=$(echo $n | cut -d '.' -f 1)
+		else
+			n=$(($(echo $n | cut -d '.' -f 1)+1))
+		fi
+		r=$(printf "%0.s$sign" {$(seq 1 $n)})
+		if [ -n "$GAUGE" ]
+		then
+			if [ $n -ne $LENGTH ]
+			then
+				r+=$(printf "%0.s${SIGNS:1:1}" {$(seq $((n+1)) $LENGTH)})
+			fi
+		fi
+	fi
+	echo $r
 }
 function koca_isBackgrounded() { # Return true is process is backgrounded. Thanks to http://is.gd/4h3fk0
 	case $(ps -o stat= -p $$) in
