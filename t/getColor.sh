@@ -8,8 +8,7 @@ testGetColorReturn1onBadNumberOfArgument() {
 testGetColorReturnACode() {
 	unset a
 	allcolors=$(getColor list| grep '#' | cut -d ' ' -f 2)
-	#local code=$(tput el1)$(tput cr)
-	local r=$(tput setaf 9)$(tput setab 9)
+	local r=$(tput sgr0)
 	for c in $allcolors
 	do
 		getColor a $c
@@ -33,13 +32,13 @@ testGetColorReturnClearedVar() {
 testGetColorReturnAugmentedVarDoubleColored() {
 	a=a
 	getColor a+ red reset
-	b=$"$(tput setaf 1)"$(tput setaf 9)$(tput setab 9)
+	b=$"$(tput setaf 1)"$(tput sgr0)
 	assertEquals "GetColor failed to return previous variable double colored" "a$b" "$a"
 }
 testGetColorReturnCleanVarDoubleColored() {
 	a=a
 	getColor a red reset
-	b=$"$(tput setaf 1)"$(tput setaf 9)$(tput setab 9)
+	b=$"$(tput setaf 1)"$(tput sgr0)
 	assertEquals "GetColor failed to return a clean variable when double colored " "$b" "$a"
 }
 testGetColorWorksEvenIfItsC() {

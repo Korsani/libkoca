@@ -13,16 +13,18 @@ function getColor { # Return a specified color code in a specified var
 	then
 		return
 	fi
-	# For almost every uname...
-	tput_af="setaf"
-	tput_ab="setab"
-	bold=bold
+	#   For almost every uname...
+    local tput_af="setaf"
+    local tput_ab="setab"
+    local bold=bold
+    local reset=sgr0
 	# but FreeBSD doesn't use terminfo
 	if [ "$(uname)" = "FreeBSD" ]
 	then
 		tput_af=AF
 		tput_ab=AB
 		bold=md
+		reset=me
 	fi
 	function _getColor {
 	alias echo="echo -n"
@@ -56,7 +58,7 @@ function getColor { # Return a specified color code in a specified var
 			white) echo $_bold$(_getColor gray) ;;
 
 			bold) echo $_bold ;;
-			reset) echo $(tput $tput_af 9)$(tput $tput_ab 9) ;;
+			reset) echo $(tput $reset) ;;
 		esac
 		unalias echo
 	}
