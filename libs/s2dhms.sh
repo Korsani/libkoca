@@ -13,7 +13,7 @@ function s2dhms {	# seconds to day hour min sec, of xx:xx:xx if -I. Return NaN o
 		echo '    NaN    '
 		return
 	fi
-	if [ "$FORMAT" == "I" -a $w -ge 864000 ]
+	if [ "$FORMAT" == "I" -a $w -ge 8553600 ]
 	then
 		echo '    OoR    '
 		return
