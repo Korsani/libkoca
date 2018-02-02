@@ -123,8 +123,7 @@ function getColor { # Return a specified color code in a specified var
 		shift
         if echo " $allcolors "| grep -q " $name "
         then
-			# seem to ill behave when name=reset and TERM=linux...
-			eval ${var}=$"$_val"$"$(_getColor "$name")"
+			eval ${var}=$"$_val"$"\$(_getColor "$name")"
         else
             if [ "$name" = "" ]
             then
