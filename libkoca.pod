@@ -1,0 +1,78 @@
+=head1 NAME
+
+libkoca - A (hopefully) usefull shell librairy
+
+=head1 SYNOPSIS
+
+source libkoca.sh
+
+eval $(sh libkoca.sh <function> [ <function> ] ))
+
+bash libkoca.sh list
+
+=head1 DESCRIPTION
+
+=head2 koca_b2gmk - byte to giga, mega, kilo (tera, peta)
+
+=head2 checkNeededFiles 
+
+=head2 koca_cleanOnExit - Remove specified file on script exiting
+
+=head2 dhms2s - day/hour/min/sec to seconds
+
+=head2 dieIfNotRoot - Exit calling script if not running under root
+
+=head2 dieIfRoot - Exit calling script if run under root
+
+=head2 underSudo - Return wether the calling script is run under sudo
+
+=head2 gotRoot - Return wether the calling script is run under root
+
+=head2 doAndLog
+
+=head2 fclone - Clone a function
+
+=head2 getColor - Return a specified color code in a specified var
+
+=head2 getConfValue
+
+=head2 getConfAllKeys
+
+=head2 getConfAllSections
+
+=head2 koca_int2pm - return +, ++, +++ (or -). <value> [ <max> [ <length> [ 'gauge' [ <sign+><sign-> ] ] ] ]
+
+=head2 koca_isBackgrounded() - Return true is process is backgrounded. Thanks to http://is.gd/4h3fk0
+
+=head2 isIp - return true if parameter is an IPv4/IPv6 address
+
+=head2 koca_isNumeric - return true if parameter is numeric
+
+=head2 koca_join - join lines from STDIN whith $1
+
+=head2 koca_load() - Return true if load is less or equals to specified float value
+
+=head2 koca_lockMe - Lock the calling script on the specified file
+
+=head2 koca_unlockMe - unlock
+
+=head2 koca_isLocked
+
+=head2 koca_log
+
+=head2 koca_quotemeta - Escape meta character
+
+=head2 s2dhms  - seconds to day hour min sec, of xx:xx:xx if -I. Return NaN or Oor if error
+
+=head2 koca_spin - Display a spinning cursor
+
+=head2 underTest
+
+=head2 whereAmI
+
+=head2 whereIs
+
+=head1 EXAMPLES
+
+=head1 SEE ALSO
+
