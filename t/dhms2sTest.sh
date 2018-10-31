@@ -23,6 +23,8 @@ testdhms2s() {
 	assertEquals "dhms badly parsed" "61" "$d"
 	d=$(dhms2s 1s1d)
 	assertEquals "dhms badly parsed" "86401" "$d"
+	d=$(dhms2s 1ds)
+	assertEquals "dhms is not smart" "86400" "$d"
 	d=$(echo 1s1d | dhms2s)
 	assertEquals "dhms doesn't accept dat on standard input" "86401" "$d"
 	d=$(dhms2s k)
