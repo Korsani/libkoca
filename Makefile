@@ -8,6 +8,12 @@ MAKEFLAGS += --no-print-directory --silent
 
 PREFIX=/usr/local
 MAN_SECTION=3
+OS=$(shell uname)
+ifeq "FreeBSD" "${OS}"
+MAN_DIR=$(PREFIX)/man/man$(MAN_SECTION)
+else
+MAN_DIR=$(PREFIX)/share/man/man$(MAN_SECTION)
+endif
 MAN_PAGE=libkoca.$(MAN_SECTION)
 FN=libkoca.sh
 FNMODE=0644
@@ -23,7 +29,7 @@ man: libkoca.$(MAN_SECTION)
 
 libkoca.$(MAN_SECTION): libkoca.pod
 	$(info Generating $@)
-	pod2man < $< > $@
+	podchecker $< && pod2man -name libkoca < $< > $@
 
 $(FN): $(OUT)
 	cat $(OUT) | sed -e "s/__libname__/$(FN)/" > $@
@@ -31,7 +37,7 @@ $(FN): $(OUT)
 
 $(OUT): out/%.sh: libs/%.sh
 	echo -n "Testing $< ... "
-	bash $(subst libs,t,$<) >/dev/null && cp libs/$(notdir $<) $@ && echo OK
+	bash $(subst .sh,Test.sh,$(subst libs,t,$<)) >/dev/null && cp libs/$(notdir $<) $@ && echo OK
 
 clean: bclean dclean
 	rm -f $(OUT)
@@ -42,12 +48,12 @@ version:
 
 ifneq "" "$(shell getent passwd www-data)"
 ifneq "" "$(wildcard /var/www/files)"
-install: $(PREFIX)/include/$(FN) $(WWW_DIR)/$(FN) $(PREFIX)/share/man/man$(MAN_SECTION)/$(MAN_PAGE).gz
+install: $(PREFIX)/include/$(FN) $(WWW_DIR)/$(FN) $(MAN_DIR)/$(MAN_PAGE).gz
 else
-install: $(PREFIX)/include/$(FN) $(PREFIX)/share/man/man$(MAN_SECTION)/$(MAN_PAGE).gz
+install: $(PREFIX)/include/$(FN) $(MAN_DIR)/$(MAN_PAGE).gz
 endif
 else
-install: $(PREFIX)/include/$(FN) $(PREFIX)/share/man/man$(MAN_SECTION)/$(MAN_PAGE).gz
+install: $(PREFIX)/include/$(FN) $(MAN_DIR)/$(MAN_PAGE).gz
 endif
 
 $(PREFIX)/include/$(FN): $(FN)
@@ -60,10 +66,10 @@ $(PREFIX)/include/$(FN): $(FN)
 $(WWW_DIR)/$(FN): $(FN) /var/www/files
 	install -o www-data -m0644 $< $@
 
-$(PREFIX)/share/man/man$(MAN_SECTION)/$(MAN_PAGE).gz: $(PREFIX)/share/man/man$(MAN_SECTION)/$(MAN_PAGE)
+$(MAN_DIR)/$(MAN_PAGE).gz: $(MAN_DIR)/$(MAN_PAGE)
 	gzip $<
 
-$(PREFIX)/share/man/man$(MAN_SECTION)/$(MAN_PAGE): libkoca.$(MAN_SECTION)
+$(MAN_DIR)/$(MAN_PAGE): libkoca.$(MAN_SECTION)
 	install -D -m0644 $< $@
 
 -include commun.mk
