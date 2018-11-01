@@ -301,7 +301,7 @@ Example:
 Return true if parameter is numeric.
 
 Usage:
-	
+
 	koca_isNumeric <n>
 
 Example:
@@ -319,7 +319,7 @@ Usage:
 	koca_join [ <glue string> ]
 
 Example:
-	
+
 	$ echo -e "1\n2\n3" | koca_join " and "
 	1 and 2 and 3
 
@@ -400,7 +400,7 @@ Example:
 Display a spinning cursor.
 
 Usage:
-	
+
 	koca_spin
 
 Example:
