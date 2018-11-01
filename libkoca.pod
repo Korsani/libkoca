@@ -1,78 +1,442 @@
 =head1 NAME
 
-libkoca - A (hopefully) usefull shell librairy
+libkoca - An (hopefully) useful shell librairy
 
 =head1 SYNOPSIS
 
-source libkoca.sh
+Include all the functions in the name space of your script:
 
-eval $(sh libkoca.sh <function> [ <function> ] ))
+	source libkoca.sh
 
-bash libkoca.sh list
+Include only some functions:
+
+	eval $(sh libkoca.sh <function> [ <function> ] ))
+
+List the functions of the librairy:
+
+	bash libkoca.sh list
 
 =head1 DESCRIPTION
 
-=head2 koca_b2gmk - byte to giga, mega, kilo (tera, peta)
+Libkoca contain few functions that are hopefully useful when you write shell scripts
 
-=head2 checkNeededFiles 
+=head2 koca_b2gmk
 
-=head2 koca_cleanOnExit - Remove specified file on script exiting
+Convert integer to kilo/mega/giga/tera/peta, rounded to 1 digit, and supposing 1k is 1024.
 
-=head2 dhms2s - day/hour/min/sec to seconds
+Usage:
+	koca_b2gmk <int>
 
-=head2 dieIfNotRoot - Exit calling script if not running under root
+Examples:
 
-=head2 dieIfRoot - Exit calling script if run under root
+	$ koca_b2gmk 12345
+	12.0k
+	$ koca_b2gmk 1234567890
+	1.1G
+	$ size=$(koca_b2gmk 12345)B; echo $size
+	12.0kB
 
-=head2 underSudo - Return wether the calling script is run under sudo
 
-=head2 gotRoot - Return wether the calling script is run under root
+=head2 checkNeededFiles
 
-=head2 doAndLog
+Check wether given file exists. 'may' or 'must' change only the error message. Exit code is 1 if file is not found.
 
-=head2 fclone - Clone a function
+Usage:
 
-=head2 getColor - Return a specified color code in a specified var
+	checkNeededFiles may|must <file> [ <file> [ <file> [ ... ] ]
 
-=head2 getConfValue
+Examples:
 
-=head2 getConfAllKeys
+	$ checkNeededFiles may ffmpeg
+	[libkoca.sh] 'ffmpeg' not found. Bad things may happen
+	$ checkNeededFiles must ffmpeg
+	[libkoca.sh] 'gna' not found. Bad things WILL happen
 
-=head2 getConfAllSections
 
-=head2 koca_int2pm - return +, ++, +++ (or -). <value> [ <max> [ <length> [ 'gauge' [ <sign+><sign-> ] ] ] ]
+=head2 koca_cleanOnExit
 
-=head2 koca_isBackgrounded() - Return true is process is backgrounded. Thanks to http://is.gd/4h3fk0
+Remove specified file on script exit.
 
-=head2 isIp - return true if parameter is an IPv4/IPv6 address
+Usage:
 
-=head2 koca_isNumeric - return true if parameter is numeric
+	koca_cleanOnExit <file> [ <file> [ <file> [ ... ] ]
 
-=head2 koca_join - join lines from STDIN whith $1
+Example:
 
-=head2 koca_load() - Return true if load is less or equals to specified float value
+	#!/usr/bin/bash
+	tmpfile=$(mktemp)
+	tmpfile2=$(mktemp)
+	koca_cleanOnExit $tmpfile
+	koca_cleanOnExit $tmpfile2
 
-=head2 koca_lockMe - Lock the calling script on the specified file
+=head2 dhms2s
 
-=head2 koca_unlockMe - unlock
+Convert day/hour/min/sec to seconds.
+
+Usage: 
+
+	dhms2s <dhms>
+
+Examples:
+
+	$ dhms2s 1d
+	86400
+	$ dhms2s 1h1min1s
+	3661
+
+
+=head2 dieIfNotRoot
+
+Exit calling script if not running under root.
+
+Usage:
+
+	dieIfNotRoot
+
+Example:
+
+	#!/usr/bin/bash
+	dieIfNotRoot
+
+	$ ./script
+	[libkoca.sh] Actually, I should be run as root
+
+=head2 dieIfRoot
+
+Exit calling script if run under root.
+
+Usage:
+
+	dieIfRoot
+
+Example:
+
+	#!/usr/bin/bash
+	dieIfRoot
+
+	$ sudo ./script
+	[libkoca.sh] I should not be run as root
 
 =head2 koca_isLocked
 
-=head2 koca_log
+Return true if calling script is locked.
 
-=head2 koca_quotemeta - Escape meta character
+Usage:
 
-=head2 s2dhms  - seconds to day hour min sec, of xx:xx:xx if -I. Return NaN or Oor if error
+	koca_isLocked
 
-=head2 koca_spin - Display a spinning cursor
+Example:
 
-=head2 underTest
+	$ koca_isLocked && echo "I already exists"
+
+=head2 underSudo
+
+Return wether the calling script is run under sudo.
+
+Usage:
+
+	underSudo
+
+Example:
+
+	$ underSudo && echo "I'm run under sudo"
+
+
+=head2 gotRoot
+
+Return wether the calling script is run under root.
+
+Usage:
+
+	gotRoot
+
+Example:
+
+	$ gotRoot && echo "I am groot"
+
+=head2 getColor
+
+Return a specified color code in a specified var.
+
+Usage:
+
+	getColor <var> <color> [ <var> <color> [ ... ] ]
+	getColor list
+
+Examples:
+
+	$ getColor _re reset _g higreen _r hired
+	$ echo "$_g Green $_r Red $_re normal"
+	$ getColor list
+	# green
+	# brown
+	# red
+	# black
+	# blue
+	# cyan
+	# purple
+	# gray
+	# higreen
+	# yellow
+	# hired
+	# hiblack
+	# hiblue
+	# hicyan
+	# hipurple
+	# white
+	# bggreen
+	# bgyellow
+	# bgred
+	# bgblack
+	# bgblue
+	# bgcyan
+	# bgpurple
+	# bgwhite
+	# reset
+	# bold
+
+=head2 getConfValue
+
+Give the value of a key in an section.key=value file (a.k.a. 'properties' file).
+
+Usage:
+
+	KOCA_CONF='/path/to/conf.file' getConfValue <section> <key>
+
+Example:
+
+	$ cat me.conf
+	earth.satellite=moon
+	$ KOCA_CONF=me.conf getConfValue earth satellite
+	moon
+
+=head2 getConfAllKeys
+
+Return all keys of a section in a section.key=value file.
+
+Usage:
+
+	KOCA_CONF='/path/to/conf.file' getConfAllKeys <section>
+
+Example:
+
+	$ cat me.conf
+	jupiter.sat1=io
+	jupiter.sat2=europa
+	$ KOCA_CONF=me.conf getConfAllKeys jupiter
+	sat1
+	sat2
+	
+
+=head2 getConfAllSections
+
+Return all sections in a section.key=value file.
+
+Usage:
+
+	KOCA_CONF='/path/to/conf.file' getConfAllSections 
+
+Example:
+
+	$ cat me.conf
+	jupiter.sat1=io
+	jupiter.sat2=europa
+	$ KOCA_CONF=me.conf getConfAllSections
+	jupiter
+
+=head2 koca_int2pm
+
+Convert integer in +++ scale.
+
+Usage:
+
+	koca_int2pm <value> [ <max> [ <length> [ 'gauge' [ <sign+><sign-> ] ] ] ]
+
+	value:	Value to convert, from 1 to <max>. If value is higher than <max>, the latter will be used
+	max:	Upper limit. Default is 3
+	length:	Length of the '+' string to display. Default is 3
+	gauge:	Is specified, pad string with '-'
+	sign:	Character for + and -
+
+Examples:
+
+	$ koca_in2pm 2
+	++
+	$ koca_in2pm 2 10
+	+
+	$ koca_in2pm 2 10 10
+	++
+	$ koca_in2pm 2 10 10 gauge
+	++--------
+	$ koca_in2pm 2 10 10 gauge '<>'
+	<<>>>>>>>>
+
+=head2 koca_isBackgrounded
+
+Return true is process is backgrounded. Thanks to http://is.gd/4h3fk0
+
+Usage:
+
+	koca_isBackgrounded
+
+Example:
+
+	#!/usr/bin/bach
+	koca_isBackgrounded && do_undercover_stuffs
+
+=head2 isIp
+
+Return true if parameter is an IPv4/IPv6 address.
+
+Usage:
+
+	isIp <possible ip adress>
+
+Example:
+	$ isIp 1.2.3.27 && echo "It's an ip"
+	$ isIp 2001:0db8:0000:85a3:0000:0000:ac1f:8001 && echo "It's an ip"
+
+=head2 koca_isNumeric
+
+Return true if parameter is numeric.
+
+Usage:
+	
+	koca_isNumeric <n>
+
+Example:
+
+	$ koca_isNumeric +1 && echo 'numeric'
+	$ koca_isNumeric -1 && echo 'numeric'
+	$ koca_isNumeric 3.14 && echo 'numeric'
+
+=head2 koca_join
+
+Join lines from STDIN, as so many 'join' commands in other languages.
+
+Usage:
+
+	koca_join [ <glue string> ]
+
+Example:
+	
+	$ echo -e "1\n2\n3" | koca_join " and "
+	1 and 2 and 3
+
+=head2 koca_load
+
+Return true if load (1 min average) is less or equals to specified float value.
+
+Usage:
+
+	koca_load <float>
+
+Example:
+
+	$ koca_load 0.5 && do_something_heavy
+
+=head2 koca_lockMe
+
+Lock the calling script, preventing multiple instances to be run.
+
+Lock file will be deleted at script's exiting.
+
+Usage:
+
+	koca_lockMe <lock file>
+
+Example:
+
+	#!/usr/bin/bash
+	koca_lockMe "/var/run/$(basename "$0").lock"
+	# do some stuff
+
+=head2 koca_unlockMe
+
+Remove lock put by koca_lockMe. Return true if successful.
+
+Usage:
+
+	koca_unlockMe <lock file>
+
+Example:
+
+	#!/usr/bin/bash
+	koca_lockMe "/var/run/$(basename "$0").lock"
+	# do some stuff
+	koca_unlockMe "/var/run/$(basename "$0").lock"
+
+
+=head2 koca_quotemeta
+
+Return given string with metacharacters escaped.
+
+Usage:
+
+	koca_quotemeta <string>
+
+Example:
+
+	$ koca_quotemeta "I'm groot!"
+	I\'m\ groot\!
+
+=head2 s2dhms
+
+Seconds to day hour min sec, or xx:xx:xx:xx. Return NaN or Oor if error.
+
+Usage:
+
+	s2dhms [ -I ] <seconds>
+
+Example: 
+
+	$ s2dhms 3601
+	1h1s
+	$ s2dhms -I 10000
+	00:02:46:40
+
+=head2 koca_spin
+
+Display a spinning cursor.
+
+Usage:
+	
+	koca_spin
+
+Example:
+
+	$ for i in {1..10} ; do koca_spin ; sleep 1 ; done
 
 =head2 whereAmI
 
+Return calling script's location.
+
+Usage:
+
+	wheraAmI
+
+Example:
+
+	#!/usr/bin/bash
+	HERE=$(whereAmI)
+
+
 =head2 whereIs
 
-=head1 EXAMPLES
+Return path of the given command, ignoring your PATH variable.
+
+It looks in /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin /usr/libexec /usr/local/libexec
+
+Usage:
+
+	whereIs <command>
+
+Example:
+
+	#!/usr/bin/bash
+	curl=$(whereIs curl)
+	$curl http://www.free.fr
 
 =head1 SEE ALSO
 
+bash(1)
