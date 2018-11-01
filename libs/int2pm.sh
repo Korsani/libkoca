@@ -4,10 +4,11 @@ function koca_int2pm { # return +, ++, +++ (or -). <value> [ <max> [ <length> [ 
 	local MAX=3
 	local LENGTH=3
 	local SIGNS='+-'
+	local GAUGE=''
 	[ -n "$5" ] && SIGNS="$5"
 	[ -n "$3" ] && LENGTH="$3"
 	[ -n "$2" ] && MAX="$2"
-	[ "$4" = "gauge" ] && GAUGE="y"
+	[ "$4" == "gauge" ] && GAUGE="y"
 	
 	if ! ( [[ $MAX =~ ^[0-9]+$ ]] && [[ $val =~ ^-?[0-9]+$ ]] && [[ $LENGTH =~ ^[0-9]+$ ]])
 	then
