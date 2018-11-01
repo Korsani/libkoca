@@ -3,7 +3,8 @@ libkoca
 
 Small library for shell scripting.
 
-Including :
+# Including 
+
 * `koca_cleanOnExit` : remove a file upon script exiting (those who use mktemp will appreciate)
 * `getColor` : assign color code to a variable (for sexy logs messages).
 * `koca_lockMe` : provide a lock mechanism to your script, preventing it for being launched more than once.
@@ -13,24 +14,19 @@ Including :
 
 And some others, useful but less often : check that a string is an IPadress, convert seconds to day:hours:minutes:seconds and vice versa, return the path where the scripts is run from, clone a function to an other name, ...
 
-Featuring 
+# Featuring 
 * TU, with shunit2
 * Dynamic building : if a function do not pass the tests, it is not included in the final file.
 * Executable library : 'sh libkoca.sh' display helps. 'sh libkoca.sh listi' display the lists of functions
 * You only want the lockMe function ? do 'eval "$(libkoca.sh lockMe)"' and you'll have only this function in the name space of your script.
 
-koca_int2pm
-	Display a number in +/++/+++ notation. And a bit more
+# Installation
 
-Usage :
-	koca_int2pm <value> <max> [ <length=3> [ 'gauge' [ <sign+><sign-> ] ] ] 
+## By rebuild
 
-Example:
-	koca_int2pm 1 : +
-	koca_int2pm -1 : +
-	koca_int2pm 3 10 : +
-	koca_int2pm 3 10 10 : +++
-	koca_int2pm 10 10 10 : ++++++++++
-	koca_int2pm -5 10 10 : -----
-	koca_int2pm 1 10 10 gauge : +---------
-	koca_int2pm 1 10 10 gauge '><' : ><<<<<<<<<
+	$ make install
+
+## Using the 'static' file provided
+
+	$ cp libkoca.sh.a libkoca.sh
+	$ make install
