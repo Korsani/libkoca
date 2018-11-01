@@ -94,7 +94,7 @@ function checkNeededFiles {
 # $ . plop
 # $ f
 # Le fichier temporaire ne sera jamais effacé
-function koca_cleanOnExit { # Remove specified file on script exiting
+function koca_cleanOnExit { # Remove specified file on script exit
 	local file
 	for file in "$@"
 	do
@@ -108,7 +108,7 @@ function dhms2s {	# day hour min sec to seconds
 	# 1d1s is the same as 1s1d
 	w=$1
 	[ -z "$w" ] && read w
-	local op=$(echo "$w" | sed -e 's/\([0-9]*\)d/\1*86400 + /' -e 's/\([0-9]*\)h/\1*3600 + /' -e 's/\([0-9]*\)min/\1*60 + /' -e 's/\([0-9]*\)s/\1 + /' -e 's/+ $//' -e 's/$/+0/')
+	local op=$(echo "$w" | sed -e 's/\([0-9]*\)d/\1*86400 + /' -e 's/\([0-9]*\)h/\1*3600 + /' -e 's/\([0-9]*\)min/\1*60 + /' -e 's/\([0-9]*\)s/\1 + /' -e 's/+ $//' -e 's/$/+0/' | sed -e 's/  /0/')
 	if [[ $op =~ ^[0-9.\+\ \*]+$ ]]
 	then
 		echo $op | bc
@@ -134,34 +134,6 @@ function underSudo { # Return wether the calling script is run under sudo
 function gotRoot { # Return wether the calling script is run under root
 	[ $(id -u) -eq 0 ]
 }
-# Do something, and print if it has been well terminated
-# Usage: doAndLog <message> <command line>
-# Command line should be enclosed by '
-function doAndLog {
-	echo -n $1
-	eval "$2"
-	if [ $? -eq 0 ]
-	then
-		echo ' ..'
-	else
-		echo ' !!'
-	fi
-}
-# Return true is the name of the script is test.sh (which should be the name of the test's script
-# run the script under
-# Return false if not
-# usage : underTest <fileName>
-# Ideally filename should be `basename $0`, unless you want to do something weird (like testing the function itself)
-function fclone { # Clone a function
-	local ffrom=$1
-	local fto=$2
-	local fcom=$3
-	eval "$fto() {
-	$(type -a $ffrom | tail -n +4 )"
-	falias="$(echo $falias)$fto $fcom"
-}
-# 'alias' should work too ...
-#fclone "z_copy" "z_move" '# copy, and delete'
 # Return color code in a specified var
 # getColor var[+] color [ [ var[+] ] color [ ... ] ]
 # Ex : getColor r red g green
@@ -177,16 +149,18 @@ function getColor { # Return a specified color code in a specified var
 	then
 		return
 	fi
-	# For almost every uname...
-	tput_af="setaf"
-	tput_ab="setab"
-	bold=bold
+	#   For almost every uname...
+    local tput_af="setaf"
+    local tput_ab="setab"
+    local bold=bold
+    local reset=sgr0
 	# but FreeBSD doesn't use terminfo
 	if [ "$(uname)" = "FreeBSD" ]
 	then
 		tput_af=AF
 		tput_ab=AB
 		bold=md
+		reset=me
 	fi
 	function _getColor {
 	alias echo="echo -n"
@@ -220,7 +194,7 @@ function getColor { # Return a specified color code in a specified var
 			white) echo $_bold$(_getColor gray) ;;
 
 			bold) echo $_bold ;;
-			reset) echo $(tput $tput_af 9)$(tput $tput_ab 9) ;;
+			reset) echo $(tput $reset) ;;
 		esac
 		unalias echo
 	}
@@ -285,8 +259,7 @@ function getColor { # Return a specified color code in a specified var
 		shift
         if echo " $allcolors "| grep -q " $name "
         then
-			# seem to ill behave when name=reset and TERM=linux...
-			eval ${var}=$"$_val"$"$(_getColor "$name")"
+			eval ${var}=$"$_val"$"\$(_getColor "$name")"
         else
             if [ "$name" = "" ]
             then
@@ -344,7 +317,7 @@ function getConfValue {
 	local src=__libkoca__ ; [ -e "$src" ] && eval "$(bash "$src" _getConfGetSedOption _getConfIsReadable)"
 	local opt=$(_getConfGetSedOption)
 	_getConfIsReadable || return $?
-	local val="$(grep -Eh "^$1\.$2[[:space:]]*=" $KOCA_CONF 2>/dev/null | sed -${opt}e 's/[^=*]+=\s*//'| tail -1)"
+	local val="$(grep -Eh "^$1\.$2[[:space:]]*=" "$KOCA_CONF" 2>/dev/null | sed -${opt}e 's/[^=*]+=\s*//'| tail -1)"
 	[ -n "$val" ] && echo "$val" && return 0
 	[ -n "$3" ] && echo "$3" && return 0
 	return 2
@@ -384,10 +357,11 @@ function koca_int2pm { # return +, ++, +++ (or -). <value> [ <max> [ <length> [ 
 	local MAX=3
 	local LENGTH=3
 	local SIGNS='+-'
+	local GAUGE=''
 	[ -n "$5" ] && SIGNS="$5"
 	[ -n "$3" ] && LENGTH="$3"
 	[ -n "$2" ] && MAX="$2"
-	[ "$4" = "gauge" ] && GAUGE="y"
+	[ "$4" == "gauge" ] && GAUGE="y"
 	
 	if ! ( [[ $MAX =~ ^[0-9]+$ ]] && [[ $val =~ ^-?[0-9]+$ ]] && [[ $LENGTH =~ ^[0-9]+$ ]])
 	then
@@ -450,7 +424,7 @@ function koca_int2pm { # return +, ++, +++ (or -). <value> [ <max> [ <length> [ 
 	fi
 	echo $r
 }
-function koca_isBackgrounded() { # Return true is process is backgrounded. Thanks to http://is.gd/4h3fk0
+function koca_isBackgrounded() { # Return true if process is backgrounded. Thanks to http://is.gd/4h3fk0
 	case $(ps -o stat= -p $$) in
 		*+*) return 1;;
 		*) return 0;;
@@ -468,9 +442,9 @@ function isIp { # return true if parameter is an IPv4/IPv6 address
 	[ $isv4 -eq 0 -o $isv6 -eq 0 ]
 }
 function koca_isNumeric { # return true if parameter is numeric
-	[[ $1 =~ ^[0-9.]+$ ]]
+	[[ $1 =~ ^[+-]*[0-9.]+$ ]]
 }
-function koca_join { # join lines from STDIN whith $1
+function koca_join { # join lines from STDIN with $1
 	cat | sed -e ":a;N;\$!ba;s/\n/$1/g"
 }
 # Return true is load is less or equal to value
@@ -492,7 +466,7 @@ function koca_load() { # Return true if load is less or equals to specified floa
 # -q : sort silencieusement si le timeout expire
 # PS: le fichier ne devrait pas etre un `mktemp`, sinon ca risque pas de marcher cm prevu :)
 function koca_lockMe { # Lock the calling script on the specified file
-	local src=__libkoca__ ; [ -e $src ] && eval "$(bash $src koca_cleanOnExit)"
+	local src=__libkoca__ ; [ -e "$src" ] && eval "$(bash "$src" koca_cleanOnExit)"
 	local quiet=0
 	[ "$1" = "-q" ] && quiet=1 && shift
 	if [ -z "$1" ]
@@ -502,7 +476,7 @@ function koca_lockMe { # Lock the calling script on the specified file
 		local lock="$1"
 	fi
 	local to=60
-	[ -n "$2" ] && to=$2
+	[ -n "$2" ] && to="$2"
 	local n=0
 	if [ -s "$lock" ]
 	then
@@ -523,8 +497,8 @@ function koca_lockMe { # Lock the calling script on the specified file
 	fi
 	while [ -e $lock -a $n -le $to ]
 	do
-		[ "$quiet" -eq 0 ] && echo "[libkoca.sh] An instance is running (pid : $(/bin/cat $lock))."
-		[ "$(basename -- $0)" == "bash" ] && return
+		[ "$quiet" -eq 0 ] && echo "[libkoca.sh] An instance is running (pid : $(/bin/cat "$lock"))."
+		[ "$(basename -- "$0")" == "bash" ] && return
 		[ $to -eq 0 ] && exit 1
 		sleep 1
 		(( n++ ))
@@ -547,34 +521,16 @@ function koca_unlockMe { # unlock
 # Retourne 1 si le script a été locké par le fonction ci-dessus
 # Retourne 0 sinon
 function koca_isLocked {
-	lock=$1
-	[ -e $lock ] && return 0
+	lock="$1"
+	[ -e "$lock" ] && return 0
 	return 1
-}
-# Display string if first argument is lower than KOCA_LOG_MAX_VERBOSITY
-# Eventually can be used to log messages.
-# 
-# First export KOCA_LOG_MAX_VERBOSITY, which will be the max level of verbosity
-# Then use : koca_log <n> message
-# If <n> is lower than KOCA_LOG_MAX_VERBOSITY, <message> will be display
-function koca_log {
-	local pref="(${FUNCNAME[1]}:${BASH_LINENO[0]})"
-	if ! [[ $1 =~ [0-9]+ ]]
-	then
-		return 1
-	fi
-	if [ $KOCA_LOG_MAX_VERBOSITY -ge $1 ]
-	then
-		shift
-		echo "$*" 
-	fi
 }
 function koca_quotemeta { # Escape meta character
 	local s="$1"
 	# Is it cheating ?
 	echo "$s" | perl  '-ple$_=quotemeta'
 }
-function s2dhms {	# seconds to day hour min sec, of xx:xx:xx if -I. Return NaN or Oor if error
+function s2dhms {	# seconds to day hour min sec, or xx:xx:xx if -I. Return NaN or Oor if error
 	if [ "$1" == '-I' ]
 	then
 		FORMAT='I'
@@ -589,7 +545,7 @@ function s2dhms {	# seconds to day hour min sec, of xx:xx:xx if -I. Return NaN o
 		echo '    NaN    '
 		return
 	fi
-	if [ "$FORMAT" == "I" -a $w -ge 864000 ]
+	if [ "$FORMAT" == "I" -a $w -ge 8640000 ]
 	then
 		echo '    OoR    '
 		return
@@ -629,20 +585,6 @@ function koca_spin {	# Display a spinning cursor
 	koca_spin=(/ - \\ \| / - \\ \| ) 
 	printf "\b"${koca_spin[$koca_spin_pos]} 
     (( koca_spin_pos=(koca_spin_pos +1)%8 ))
-}
-# Return true is the name of the script is test.sh (which should be the name of the test's script
-# run the script under
-# Return false if not
-# usage : underTest <fileName>
-# Ideally filename should be `basename $0`, unless you want to do something weird (like testing the function itself)
-function underTest {
-	local me=$1
-	if [  "$me"  == "test.sh" ]
-	then
-		true
-	else
-		false
-	fi
 }
 function whereAmI {
 	pushd . >/dev/null
