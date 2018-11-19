@@ -69,6 +69,25 @@ Example:
 	koca_cleanOnExit $tmpfile
 	koca_cleanOnExit $tmpfile2
 
+=head2 koca_dec2frac
+
+Convert a decimal number to fractional number.
+
+Precision is  0.01 (0.666 is the same as 0.667) 
+
+Usage:
+
+	koca_dec2frac <float>
+
+Examples:
+
+	$ koca_dec2frac 0.666
+	2/3
+	$ koca_dec2frac 1.5
+	3/2
+	$ koca_dec2frac 0.66
+	33/50
+
 =head2 dhms2s
 
 Convert day/hour/min/sec to seconds.
@@ -437,6 +456,12 @@ Example:
 	curl=$(whereIs curl)
 	$curl http://www.free.fr
 
+=head1 REQUIREMENTS
+
+libkoca(1) try to use only bash(1) v4 functions, avoiding perl(1), php(1) and such.
+
+But... it heavily uses of bc(1).
+
 =head1 SEE ALSO
 
-bash(1)
+bash(1), bc(1)
