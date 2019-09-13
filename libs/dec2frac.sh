@@ -1,7 +1,8 @@
-# Return fraction form of a decimal number
-function koca_dec2frac {
+function koca_dec2frac {	# Return fraction form of a decimal number@
 	local n=$1
 	local PRECISION=100
+	# Choose the gnu bc
+	case $(uname) in  Linux) bc=/usr/bin/bc;; FreeBSD) bc=/usr/local/bin/bc;; esac ; $bc --version | grep -q 'Free Software' || (echo 'Not GNU bc' && exit)
 	num=$(echo "
 	precision=$PRECISION
 	define int(x) {
@@ -23,7 +24,7 @@ function koca_dec2frac {
 			print in,\"/\",i
 			break
 		}
-	}" | bc -l)
+	}" | $bc -l)
 	if [ -n "$num" ]
 	then
 		echo "$num"
