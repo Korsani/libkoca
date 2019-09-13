@@ -1,7 +1,7 @@
 #$Id: Makefile 1161 2013-01-03 10:28:56Z gab $
 PROJECT=libkoca.sh
 CATEGORY=autre
-DISTNAME=shlibkoca
+DISTNAME=libkoca
 VERSIONFROM=make version
 DESCRIPTION='Useful shell functions'
 MAKEFLAGS += --no-print-directory --silent
@@ -35,7 +35,7 @@ $(FN): $(OUT)
 	cat $(OUT) | sed -e "s/__libname__/$(FN)/" > $@
 	$(info $@ built)
 
-$(OUT): out/%.sh: libs/%.sh
+$(OUT): out/%.sh: libs/%.sh t/%Test.sh
 	echo -n "Testing $< ... "
 	bash $(subst .sh,Test.sh,$(subst libs,t,$<)) >/dev/null && cp libs/$(notdir $<) $@ && echo OK
 
