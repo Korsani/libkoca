@@ -245,7 +245,6 @@ Example:
 	$ KOCA_CONF=me.conf getConfAllKeys jupiter
 	sat1
 	sat2
-	
 
 =head2 getConfAllSections
 
