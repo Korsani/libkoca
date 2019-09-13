@@ -6,6 +6,7 @@ _outdated() {
     eval alias $1="\"echo '[libkoca.sh] Please use koca_$1, instead of $1'; koca_$1\""
 }
 function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
+	case $(uname) in  Linux) bc=/usr/bin/bc;; FreeBSD) bc=/usr/local/bin/bc;; esac ; $bc --version | grep -q 'Free Software' || (echo 'Not GNU bc' && exit)
 	w="$1"
 	if ! [[ "$w" =~ ^[0-9]+$ ]]
 	then
@@ -17,16 +18,16 @@ function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
 	symbols=(. k M G T P ) # Eo, Zo and Yo are too big. 'o' is for alignment
 	for i in $(seq ${#symbols[*]})
 	do
-		values[$i]=$(echo 1024^$i|bc)
+		values[$i]=$(echo 1024^$i|$bc)
 	done
 	for i in $(seq ${#symbols[*]} -1 1)
 	do
 		if [ $w -ge ${values[$i]} ]
 		then
-			pw=$(echo "scale=1;$w/${values[$i]}" | bc)
+			pw=$(echo "scale=1;$w/${values[$i]}" | $bc)
 			[ "$pw" != "0" ] && echo "${pw}${symbols[$i]}" && return
 		fi
-		w=$(echo "scale=0;$w%${values[$i]}" | bc)
+		w=$(echo "scale=0;$w%${values[$i]}" | $bc)
 	done
 
 	echo "${w}"
@@ -102,6 +103,41 @@ function koca_cleanOnExit { # Remove specified file on script exit
 		[ -n "$t" ] && _oldTrap0=$(echo "$t ;" | sed -e "s/trap -- '\(.*\)' EXIT/\1/")
 		trap "$_oldTrap0 rm -f \"$file\"" 0
 	done
+}
+function koca_dec2frac {	# Return fraction form of a decimal number@
+	local n=$1
+	local PRECISION=100
+	# Choose the gnu bc
+	case $(uname) in  Linux) bc=/usr/bin/bc;; FreeBSD) bc=/usr/local/bin/bc;; esac ; $bc --version | grep -q 'Free Software' || (echo 'Not GNU bc' && exit)
+	num=$(echo "
+	precision=$PRECISION
+	define int(x) {
+		auto s
+		s = scale
+		scale = 0
+		x /= 1
+		scale = s
+		return (x)
+	}
+	n=$n
+	scale=l(precision)/l(10)
+	for (i=2;i<=precision-1;i++) {
+		in=int(i*n)
+		if (int(i*n+1/precision)>in) {
+			print 1+in,\"/\",i
+			break
+		} else if (in==i*n) {
+			print in,\"/\",i
+			break
+		}
+	}" | $bc -l)
+	if [ -n "$num" ]
+	then
+		echo "$num"
+	else
+		/bin/false
+	fi
+	return
 }
 function dhms2s {	# day hour min sec to seconds
 	# can be specified in any order :
@@ -317,7 +353,7 @@ function getConfValue {
 	local src=__libkoca__ ; [ -e "$src" ] && eval "$(bash "$src" _getConfGetSedOption _getConfIsReadable)"
 	local opt=$(_getConfGetSedOption)
 	_getConfIsReadable || return $?
-	local val="$(grep -Eh "^$1\.$2[[:space:]]*=" "$KOCA_CONF" 2>/dev/null | sed -${opt}e 's/[^=*]+=\s*//'| tail -1)"
+	local val="$(grep -Eh "^$1\.$2[[:space:]]*=" "$KOCA_CONF" 2>/dev/null | sed -${opt}e 's/[^=*]+=[[:space:]]*//'| tail -1)"
 	[ -n "$val" ] && echo "$val" && return 0
 	[ -n "$3" ] && echo "$3" && return 0
 	return 2
@@ -445,14 +481,25 @@ function koca_isNumeric { # return true if parameter is numeric
 	[[ $1 =~ ^[+-]*[0-9.]+$ ]]
 }
 function koca_join { # join lines from STDIN with $1
-	cat | sed -e ":a;N;\$!ba;s/\n/$1/g"
+	# Usefulness of this very function is questionable...
+	cat | paste -s -d"$1" -
 }
 # Return true is load is less or equal to value
 function koca_load() { # Return true if load is less or equals to specified float value
 	thr=$1
-	if [[ $thr =~ ^-?[0-9]+\.?[0-9]*$ ]]
+	# Shamelessly stolen from: https://bash.cyberciti.biz/monitoring/monitor-unix-linux-system-load/
+	OS="$(uname)"
+	TRUE="1"
+	if [ "$OS" == "FreeBSD" ]; then
+		FTEXT='load averages:'
+	elif [ "$OS" == "Linux" ]; then
+		FTEXT='load average:'
+	fi
+	if [[ $thr =~ ^-?0?[1-9]*\.?[0-9]*$ ]]
 	then
-		return  $(bc <<< "$(cat /proc/loadavg | awk '{printf "%.0f",$1}') > $1")
+		# Uptime is cross-plateform. cat /proc/loadavg is not
+		# LANG=C make '.' the decimal separator
+		return  $(bc <<< "$(LANG=C uptime | awk -F "$FTEXT" '{ print $2 }' | cut -d, -f1) > $1")
 	else
 		echo "[libkoca.sh] '$1' is not a float or int" >&2
 		return 2

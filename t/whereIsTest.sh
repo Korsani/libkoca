@@ -10,14 +10,14 @@ testWhereIsIsTrueIfFileIsInPath() {
 }
 testWhereIsIsTrueIfFileIsNotInPath() {
 	p=$PATH
-	PATH='/usr/bin'
-	w=`whereIs ls`
-	assertTrue 'File ls should have been found, even if not in path' "$?"
+	PATH='/usr/bin:/bin'
+	w=$(whereIs perl)
+	assertTrue 'File perl should have been found even if PATH has been modified' "$?"
 	PATH=$p
 }
 testWhereIsReturnOnlyOneLine() {
 	val=$(whereIs bash)
-	w=$(echo $val | wc -l)
+	w=$(echo $val | wc -l | xargs)
 	assertEquals "whereIs returned more than one line" "1" "$w"
 }
 testWhereIsReturnFileWhenAbsolutePathIsGiven() {

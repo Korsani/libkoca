@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 # $Id: getColor.sh 1164 2013-01-08 10:15:48Z gab $
 source $(cd $(dirname "$0") ; pwd)/bootstrap.sh
+tput_af="setaf"
+tput_ab="setab"
+bold=bold
+reset=sgr0
+if [ "$(uname)" = "FreeBSD" ]
+then
+	tput_af=AF
+	tput_ab=AB
+	bold=md
+	reset=me
+fi
 testGetColorReturn1onBadNumberOfArgument() {
 	getColor plop 2>/dev/null ; r=$?
 	assertEquals "getColor should return 1" "1" "$r"
@@ -20,30 +31,30 @@ testGetColorReturnACode() {
 testGetColorReturnAugmentedVar() {
 	a=a
 	getColor a+ red
-	b=$"$(tput setaf 1)"
+	b=$"$(tput $tput_af 1)"
 	assertEquals "GetColor failed to return previous variable" "a$b" "$a"
 }
 testGetColorReturnClearedVar() {
 	a=a
 	getColor a red
-	b=$"$(tput setaf 1)"
+	b=$"$(tput $tput_af 1)"
 	assertEquals "GetColor failed to return clean variable" "$b" "$a"
 }
 testGetColorReturnAugmentedVarDoubleColored() {
 	a=a
 	getColor a+ red reset
-	b=$"$(tput setaf 1)"$(tput sgr0)
+	b=$"$(tput $tput_af 1)"$(tput $reset)
 	assertEquals "GetColor failed to return previous variable double colored" "a$b" "$a"
 }
 testGetColorReturnCleanVarDoubleColored() {
 	a=a
 	getColor a red reset
-	b=$"$(tput setaf 1)"$(tput sgr0)
+	b=$"$(tput $tput_af 1)"$(tput $reset)
 	assertEquals "GetColor failed to return a clean variable when double colored " "$b" "$a"
 }
 testGetColorWorksEvenIfItsC() {
 	getColor c red
-	b=$"$(tput setaf 1)"
+	b=$"$(tput $tput_af 1)"
 	assertEquals "Bad code returned" "$b" "$c"
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh

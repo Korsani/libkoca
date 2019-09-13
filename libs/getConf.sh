@@ -44,7 +44,7 @@ function getConfValue {
 	local src=__libkoca__ ; [ -e "$src" ] && eval "$(bash "$src" _getConfGetSedOption _getConfIsReadable)"
 	local opt=$(_getConfGetSedOption)
 	_getConfIsReadable || return $?
-	local val="$(grep -Eh "^$1\.$2[[:space:]]*=" "$KOCA_CONF" 2>/dev/null | sed -${opt}e 's/[^=*]+=\s*//'| tail -1)"
+	local val="$(grep -Eh "^$1\.$2[[:space:]]*=" "$KOCA_CONF" 2>/dev/null | sed -${opt}e 's/[^=*]+=[[:space:]]*//'| tail -1)"
 	[ -n "$val" ] && echo "$val" && return 0
 	[ -n "$3" ] && echo "$3" && return 0
 	return 2
