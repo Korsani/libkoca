@@ -19,8 +19,11 @@ And some others, less often useful: check that a string is an IPadress, convert 
 * Dynamic building: if a function does not pass the tests, it is not included in the final file.
 * Executable library: 'sh libkoca.sh' display helps. 'sh libkoca.sh list' display the lists of functions.
 * You only want the lockMe function ? do 'eval "$(libkoca.sh lockMe)"' and you'll have only this function in the namespace of your script.
+* Tested on Linux and FreeBSD
 
 # Installation
+
+On FreeBSD you'll need the GNU bc for koca_dec2frac. For Linux, bc is probably already installed. If not, please install it.
 
 ## By rebuild
 
