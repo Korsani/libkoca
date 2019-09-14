@@ -1,5 +1,4 @@
 function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
-	case $(uname) in  Linux) bc=/usr/bin/bc;; FreeBSD) bc=/usr/local/bin/bc;; esac ; $bc --version | grep -q 'Free Software' || (echo 'Not GNU bc' && exit)
 	w="$1"
 	if ! [[ "$w" =~ ^[0-9]+$ ]]
 	then
@@ -11,16 +10,16 @@ function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
 	symbols=(. k M G T P ) # Eo, Zo and Yo are too big. 'o' is for alignment
 	for i in $(seq ${#symbols[*]})
 	do
-		values[$i]=$(echo 1024^$i|$bc)
+		values[$i]=$(echo 1024^$i|bc)
 	done
 	for i in $(seq ${#symbols[*]} -1 1)
 	do
 		if [ $w -ge ${values[$i]} ]
 		then
-			pw=$(echo "scale=1;$w/${values[$i]}" | $bc)
+			pw=$(echo "scale=1;$w/${values[$i]}" | bc)
 			[ "$pw" != "0" ] && echo "${pw}${symbols[$i]}" && return
 		fi
-		w=$(echo "scale=0;$w%${values[$i]}" | $bc)
+		w=$(echo "scale=0;$w%${values[$i]}" | bc)
 	done
 
 	echo "${w}"

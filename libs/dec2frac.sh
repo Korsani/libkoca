@@ -2,7 +2,12 @@ function koca_dec2frac {	# Return fraction form of a decimal number@
 	local n=$1
 	local PRECISION=100
 	# Choose the gnu bc
-	case $(uname) in  Linux) bc=/usr/bin/bc;; FreeBSD) bc=/usr/local/bin/bc;; esac ; $bc --version | grep -q 'Free Software' || (echo 'Not GNU bc' && exit)
+	declare -A bc
+	bc['Linux']='/usr/bin/bc'
+	bc['Darwin']='/usr/bin/bc'
+	bc['FreeBSD']='/usr/local/bin/bc'
+	os=$(uname)
+	${bc[$os]} --version | grep -q 'Free Software' || (echo 'Not GNU bc' && exit)
 	num=$(echo "
 	precision=$PRECISION
 	define int(x) {
@@ -24,7 +29,7 @@ function koca_dec2frac {	# Return fraction form of a decimal number@
 			print in,\"/\",i
 			break
 		}
-	}" | $bc -l)
+	}" | ${bc[$os]} -l)
 	if [ -n "$num" ]
 	then
 		echo "$num"
