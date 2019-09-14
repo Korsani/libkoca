@@ -40,10 +40,9 @@ $(OUT): out/%.sh: libs/%.sh t/%Test.sh
 	bash $(subst .sh,Test.sh,$(subst libs,t,$<)) >/dev/null && cp libs/$(notdir $<) $@ && echo OK
 
 clean: bclean dclean
-	$(info Cleaning out/*)
+	$(info Cleaning)
 	rm -f $(OUT)
-	$(info Cleaning man pages)
-	rm -f libkoca.$(MAN_SECTION)
+	rm -f libkoca.$(MAN_SECTION) $(FN)
 
 version:
 	@bash $(FN) version

@@ -345,6 +345,8 @@ Example:
 
 Return true if load (1 min average) is less or equals to specified float value.
 
+Load is 2-digit precise.
+
 Usage:
 
 	koca_load <float>
