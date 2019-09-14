@@ -9,7 +9,7 @@ MAKEFLAGS += --no-print-directory --silent
 PREFIX=/usr/local
 MAN_SECTION=3
 OS=$(shell uname)
-ifeq "FreeBSD" "${OS}"
+ifeq "FreeBSD" "$(OS)"
 MAN_DIR=$(PREFIX)/man/man$(MAN_SECTION)
 else
 MAN_DIR=$(PREFIX)/share/man/man$(MAN_SECTION)
@@ -36,16 +36,22 @@ $(FN): $(OUT)
 	$(info $@ built)
 
 $(OUT): out/%.sh: libs/%.sh t/%Test.sh
-	echo -n "Testing $< ... "
+	$(ECHO) -n "Testing $< ... "
 	bash $(subst .sh,Test.sh,$(subst libs,t,$<)) >/dev/null && cp libs/$(notdir $<) $@ && echo OK
 
 clean: bclean dclean
+	$(info Cleaning out/*)
 	rm -f $(OUT)
+	$(info Cleaning man pages)
 	rm -f libkoca.$(MAN_SECTION)
 
 version:
 	@bash $(FN) version
 
+# getent doesn't exist on Darwin. And I don't need to install www part on Darwin...
+ifeq "" "$(filter $(OS),Darwin)"
+# And... echo is echo
+ECHO=echo
 ifneq "" "$(shell getent passwd www-data)"
 ifneq "" "$(wildcard /var/www/files)"
 install: $(PREFIX)/include/$(FN) $(WWW_DIR)/$(FN) $(MAN_DIR)/$(MAN_PAGE).gz
@@ -55,11 +61,15 @@ endif
 else
 install: $(PREFIX)/include/$(FN) $(MAN_DIR)/$(MAN_PAGE).gz
 endif
+else
+# and echo is not echo on Darwin
+ECHO=/usr/local/opt/coreutils/libexec/gnubin/echo
+endif
 
 $(PREFIX)/include/$(FN): $(FN)
 	install -D -m0644 $< $@
 	rm -f $(PREFIX)/include/commun.sh
-	echo 'echo "Unused" >&2' > $(PREFIX)/include/commun.sh
+	$(ECHO) 'echo "Unused" >&2' > $(PREFIX)/include/commun.sh
 	$(info Installed in $(PREFIX)/include)
 
 # If dest file has to be installed in /var/www/files, it should exists BEFORE, as I won't create it
