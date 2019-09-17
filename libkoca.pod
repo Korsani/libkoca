@@ -419,13 +419,15 @@ Example:
 
 Display a spinning cursor.
 
+n is the spin type, from 0 to 2, included. 0 by default, of if n is greater than 2.
+
 Usage:
 
-	koca_spin
+	koca_spin [n]
 
 Example:
 
-	$ for i in {1..10} ; do koca_spin ; sleep 1 ; done
+	$ for i in {1..10} ; do koca_spin 2 ; sleep 1 ; done
 
 =head2 whereAmI
 
