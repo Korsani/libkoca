@@ -63,6 +63,7 @@ endif
 else
 # and echo is not echo on Darwin
 ECHO=/usr/local/opt/coreutils/libexec/gnubin/echo
+install: $(PREFIX)/include/$(FN) $(MAN_DIR)/$(MAN_PAGE).gz
 endif
 
 $(PREFIX)/include/$(FN): $(FN)
