@@ -6,7 +6,6 @@ _outdated() {
     eval alias $1="\"echo '[libkoca.sh] Please use koca_$1, instead of $1'; koca_$1\""
 }
 function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
-	case $(uname) in  Linux) bc=/usr/bin/bc;; FreeBSD) bc=/usr/local/bin/bc;; esac ; $bc --version | grep -q 'Free Software' || (echo 'Not GNU bc' && exit)
 	w="$1"
 	if ! [[ "$w" =~ ^[0-9]+$ ]]
 	then
@@ -18,16 +17,16 @@ function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
 	symbols=(. k M G T P ) # Eo, Zo and Yo are too big. 'o' is for alignment
 	for i in $(seq ${#symbols[*]})
 	do
-		values[$i]=$(echo 1024^$i|$bc)
+		values[$i]=$(echo 1024^$i|bc)
 	done
 	for i in $(seq ${#symbols[*]} -1 1)
 	do
 		if [ $w -ge ${values[$i]} ]
 		then
-			pw=$(echo "scale=1;$w/${values[$i]}" | $bc)
+			pw=$(echo "scale=1;$w/${values[$i]}" | bc)
 			[ "$pw" != "0" ] && echo "${pw}${symbols[$i]}" && return
 		fi
-		w=$(echo "scale=0;$w%${values[$i]}" | $bc)
+		w=$(echo "scale=0;$w%${values[$i]}" | bc)
 	done
 
 	echo "${w}"
@@ -108,7 +107,12 @@ function koca_dec2frac {	# Return fraction form of a decimal number@
 	local n=$1
 	local PRECISION=100
 	# Choose the gnu bc
-	case $(uname) in  Linux) bc=/usr/bin/bc;; FreeBSD) bc=/usr/local/bin/bc;; esac ; $bc --version | grep -q 'Free Software' || (echo 'Not GNU bc' && exit)
+	declare -A bc
+	bc['Linux']='/usr/bin/bc'
+	bc['Darwin']='/usr/bin/bc'
+	bc['FreeBSD']='/usr/local/bin/bc'
+	os=$(uname)
+	${bc[$os]} --version | grep -q 'Free Software' || (echo 'Not GNU bc' && exit)
 	num=$(echo "
 	precision=$PRECISION
 	define int(x) {
@@ -130,7 +134,7 @@ function koca_dec2frac {	# Return fraction form of a decimal number@
 			print in,\"/\",i
 			break
 		}
-	}" | $bc -l)
+	}" | ${bc[$os]} -l)
 	if [ -n "$num" ]
 	then
 		echo "$num"
@@ -248,13 +252,12 @@ function getColor { # Return a specified color code in a specified var
 		do
 			if [ -t 1 ]
 			then
-				echo "$r# $(_getColor $i)$i"
+				echo "$r# $(_getColor $i)$i$r"
 			else
 				echo "# $i"
 			fi
 		done
-		echo -ne $r
-		echo "Usage : getColor var[+] color [ [ var[+] ] color [ ... ] ]"
+		echo "Usage: getColor var[+] color [ [ var[+] ] color [ ... ] ]"
 		return 0
 	fi
 	[ $(expr ${#*}) -eq 1 ] && echo 'Bad number of arguments' >&2 && return 1
@@ -293,15 +296,15 @@ function getColor { # Return a specified color code in a specified var
 		fi
         #echo "old value of 'var' is : $val"
 		shift
-        if echo " $allcolors "| grep -q " $name "
+        if echo " $allcolors " | grep -q " $name "
         then
 			eval ${var}=$"$_val"$"\$(_getColor "$name")"
         else
-            if [ "$name" = "" ]
+            if [ -z "$name" ]
             then
-                echo "$FUNCNAME : Missing a color after variable '$var'"
+                echo "$FUNCNAME: Missing a color after variable '$var'"
             else
-                echo "$FUNCNAME : $name is not a valid color. Try '$FUNCNAME list'"
+                echo "$FUNCNAME: $name is not a valid color. Try '$FUNCNAME list'"
             fi
             return
         fi
@@ -489,17 +492,15 @@ function koca_load() { # Return true if load is less or equals to specified floa
 	thr=$1
 	# Shamelessly stolen from: https://bash.cyberciti.biz/monitoring/monitor-unix-linux-system-load/
 	OS="$(uname)"
-	TRUE="1"
-	if [ "$OS" == "FreeBSD" ]; then
-		FTEXT='load averages:'
-	elif [ "$OS" == "Linux" ]; then
-		FTEXT='load average:'
-	fi
+	declare -A ftext
+	ftext['FreeBSD']='load averages:'
+	ftext['Linux']='load average:'
+	ftext['Darwin']='load average:'
 	if [[ $thr =~ ^-?0?[1-9]*\.?[0-9]*$ ]]
 	then
 		# Uptime is cross-plateform. cat /proc/loadavg is not
 		# LANG=C make '.' the decimal separator
-		return  $(bc <<< "$(LANG=C uptime | awk -F "$FTEXT" '{ print $2 }' | cut -d, -f1) > $1")
+		return  $(bc <<< "$(LANG=C uptime | awk -F "${ftext[$OS]}" '{ print $2 }' | cut -d, -f1) > $1")
 	else
 		echo "[libkoca.sh] '$1' is not a float or int" >&2
 		return 2
@@ -629,9 +630,19 @@ function s2dhms {	# seconds to day hour min sec, or xx:xx:xx if -I. Return NaN o
 }
 #http://is.gd/qQc5ab
 function koca_spin {	# Display a spinning cursor
-	koca_spin=(/ - \\ \| / - \\ \| ) 
-	printf "\b"${koca_spin[$koca_spin_pos]} 
-    (( koca_spin_pos=(koca_spin_pos +1)%8 ))
+	spin=${1:-0}
+	declare -A koca_spin
+	koca_spin[0]='/-\|/-\|'
+	koca_spin[1]='|>=<|<=>' 
+	koca_spin[2]='O○·○'
+	case $spin in
+		[0-9]) ;;
+		   list) for n in ${!koca_spin[*]} ; do echo "$n:${koca_spin[$n]}" ; done ; return ;;
+			*) koca_spin[0]=$1 ; spin=0 ;;
+	esac
+	[ $spin -ge ${#koca_spin[*]} ] && spin=0
+	printf "\b"${koca_spin[$spin]:$koca_spin_pos:1} 
+    (( koca_spin_pos=(koca_spin_pos +1)%${#koca_spin[$spin]} ))
 }
 function whereAmI {
 	pushd . >/dev/null
