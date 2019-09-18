@@ -6,8 +6,8 @@ source $(cd $(dirname "$0") ; pwd)/bootstrap.sh
 export lock=/tmp/$$
 TMPDIR=${TMPDIR:=/tmp}
 testSpin() {
-	startSkipping
-	endSkipping
+	koca_spin 'a' 1 2 2>/dev/null; r=$?
+	assertFalse "Should return false" "$r"
 	# testing visual stuff, uh?
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh

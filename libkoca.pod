@@ -313,6 +313,7 @@ Usage:
 	isIp <possible ip adress>
 
 Example:
+
 	$ isIp 1.2.3.27 && echo "It's an ip"
 	$ isIp 2001:0db8:0000:85a3:0000:0000:ac1f:8001 && echo "It's an ip"
 
@@ -419,22 +420,30 @@ Example:
 
 =head2 koca_spin
 
-Display a spinning cursor.
-
-n is the spin type, from 0 to 2, included. 0 by default, of if n is greater than 2.
-
-You can also specify your own sequence.
+Display a spinning cursor or a scrolling text.
 
 Usage:
 
-	koca_spin [n]
-	koca_spin [string]
+	koca_spin [<n> [<direction> [<length>]]]
+	koca_spin [<string> [<direction> [<length>]]]
 	koca_spin list
+
+'n' is the spin type, from 0 to 2, included. 0 by default, or if n is greater than 2.
+
+'direction' is 1 (forward), -1 (backward), 0 (bounce)
+
+'length' is the length of the printed string. Default is 1.
+
+'string' is the text you want to be scrolled.
 
 Examples:
 
-	$ for i in {1..10} ; do koca_spin 2 ; sleep 1 ; done
-	$ for i in {1..10} ; do koca_spin 'abcb' ; sleep 1 ; done
+	# Normal spiner
+	$ for i in {1..10} ; do koca_spin ; sleep 1 ; done
+	# Breathing bubble
+	$ for i in {1..10} ; do koca_spin 2 -1 ; sleep 1 ; done
+	# Scrolling text
+	$ for i in {1..100} ; do koca_spin '     Please tell me how you are     ' 0 5 ; sleep 0.1 ; done
 
 =head2 whereAmI
 
@@ -470,7 +479,7 @@ Example:
 
 libkoca(1) try to use only bash(1) v4 functions, avoiding perl(1), php(1) and such.
 
-But... it heavily uses of bc(1).
+But... it heavily uses bc(1).
 
 =head1 SEE ALSO
 
