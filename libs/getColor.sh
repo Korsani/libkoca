@@ -76,12 +76,11 @@ function getColor { # Return a specified color code in a specified var
 		do
 			if [ -t 1 ]
 			then
-				echo "$r# $(_getColor $i)$i"
+				echo "$r# $(_getColor $i)$i$r"
 			else
-				echo "# $i"
+				echo "# $i$r"
 			fi
 		done
-		echo -ne $r
 		echo "Usage : getColor var[+] color [ [ var[+] ] color [ ... ] ]"
 		return 0
 	fi
