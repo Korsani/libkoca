@@ -76,10 +76,9 @@ $(PREFIX)/include/$(FN): $(FN)
 $(WWW_DIR)/$(FN): $(FN) /var/www/files
 	install -o www-data -m0644 $< $@
 
-$(MAN_DIR)/$(MAN_PAGE).gz: $(MAN_DIR)/$(MAN_PAGE)
-	gzip -f $<
-
-$(MAN_DIR)/$(MAN_PAGE): libkoca.$(MAN_SECTION)
-	install -D -m0644 $< $@
+$(MAN_DIR)/$(MAN_PAGE).gz: libkoca.$(MAN_SECTION)
+	gzip -c $< > $@
+	chmod 0644 $@
+	$(info Man page installed)
 
 -include commun.mk
