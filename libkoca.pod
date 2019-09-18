@@ -177,9 +177,11 @@ Example:
 
 Return a specified color code in a specified var.
 
+<var>+ append the color code to that variable. Adding a background color, for example.
+
 Usage:
 
-	getColor <var> <color> [ <var> <color> [ ... ] ]
+	getColor <var>[+] <color> [ <var> <color> [ ... ] ]
 	getColor list
 
 Examples:
@@ -421,13 +423,18 @@ Display a spinning cursor.
 
 n is the spin type, from 0 to 2, included. 0 by default, of if n is greater than 2.
 
+You can also specify your own sequence.
+
 Usage:
 
 	koca_spin [n]
+	koca_spin [string]
+	koca_spin list
 
-Example:
+Examples:
 
 	$ for i in {1..10} ; do koca_spin 2 ; sleep 1 ; done
+	$ for i in {1..10} ; do koca_spin 'abcb' ; sleep 1 ; done
 
 =head2 whereAmI
 

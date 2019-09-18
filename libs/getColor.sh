@@ -78,10 +78,10 @@ function getColor { # Return a specified color code in a specified var
 			then
 				echo "$r# $(_getColor $i)$i$r"
 			else
-				echo "# $i$r"
+				echo "# $i"
 			fi
 		done
-		echo "Usage : getColor var[+] color [ [ var[+] ] color [ ... ] ]"
+		echo "Usage: getColor var[+] color [ [ var[+] ] color [ ... ] ]"
 		return 0
 	fi
 	[ $(expr ${#*}) -eq 1 ] && echo 'Bad number of arguments' >&2 && return 1
@@ -120,15 +120,15 @@ function getColor { # Return a specified color code in a specified var
 		fi
         #echo "old value of 'var' is : $val"
 		shift
-        if echo " $allcolors "| grep -q " $name "
+        if echo " $allcolors " | grep -q " $name "
         then
 			eval ${var}=$"$_val"$"\$(_getColor "$name")"
         else
-            if [ "$name" = "" ]
+            if [ -z "$name" ]
             then
-                echo "$FUNCNAME : Missing a color after variable '$var'"
+                echo "$FUNCNAME: Missing a color after variable '$var'"
             else
-                echo "$FUNCNAME : $name is not a valid color. Try '$FUNCNAME list'"
+                echo "$FUNCNAME: $name is not a valid color. Try '$FUNCNAME list'"
             fi
             return
         fi
