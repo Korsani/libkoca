@@ -15,8 +15,7 @@ function koca_spin {	# Display a spinning cursor or scrolling text
 	if [ $length -gt ${#koca_spin[$spin]} ]
 	then
 		echo "[__libname__] Lenght ($length) must not be greater than the string length (${#koca_spin[$spin]})" >&2
-		/usr/bin/false
-		return
+		return 1
 	fi
 	[ $spin -ge ${#koca_spin[*]} ] && spin=0
 	declare -a index
@@ -35,5 +34,5 @@ function koca_spin {	# Display a spinning cursor or scrolling text
 	# Moving forward in index
 	(( koca_spin_pos=(koca_spin_pos+1)%${#index[@]} ))
 	# Mmm...
-	/usr/bin/true
+	return 0
 }
