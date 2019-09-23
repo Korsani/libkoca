@@ -3,14 +3,15 @@ libkoca
 
 Small library for shell scripting.
 
-# Including 
-
-* `koca_cleanOnExit`: remove a file upon script exiting (those who use mktemp will appreciate)
-* `getColor`: assign color code to a variable (for sexy logs messages).
-* `koca_lockMe`: provide a lock mechanism to your script, preventing it for being launched more than once.
-* `getConfValue`: read a key and return a value from a file .properties-like. Useful to provide a configuration file to your script.
-* `dieIfNotRoot`: exit if the script is not run as root.
-* `koca_load`: return true is load is less than a floating specified value
+* Remove a file upon script exiting (those who use mktemp will appreciate) (`koca_cleanOnExit`)
+* Assign color code to a variable (for sexy logs messages) (`getColor`)
+* Provide a lock mechanism to your script, preventing it for being launched more than once (`koca_lockMe`)
+* Read a key and return a value from a properties-like file (section.key=value). Useful to provide a configuration file to your script. (`getConfValue`)
+* Exit if the script is not run as root (`dieIfNotRoot`)
+* Return true if load is less than a floating specified value (`koca_load`)
+* Spining cursor and text scrolling (`koca_spin`)
+* Convert bytes to kilo/mega/giga/tera/peta bytes (`koca_b2gmk`)
+* and seconds tou day:hour:min:sec, and vice versa (`s2hms`, `hms2s`)
 
 And some others, less often useful: check that a string is an IPadress, convert seconds to day:hours:minutes:seconds and vice versa, return the path where the scripts is run from, clone a function to an other name, ...
 
