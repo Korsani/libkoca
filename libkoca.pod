@@ -428,13 +428,15 @@ Usage:
 	koca_spin [<string> [<direction> [<length>]]]
 	koca_spin list
 
-'n' is the spin type, from 0 to 2, included. 0 by default, or if n is greater than 2.
+'n' is the spin type, from 0 to 3, included. 0 by default, or if n is greater than 3.
 
 'direction' is 1 (forward), -1 (backward), 0 (bounce)
 
 'length' is the length of the printed string. Default is 1.
 
 'string' is the text you want to be scrolled.
+
+'list' display all the spinners.
 
 Examples:
 

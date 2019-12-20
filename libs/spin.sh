@@ -7,6 +7,7 @@ function koca_spin {	# Display a spinning cursor or scrolling text
 	koca_spin[0]='/-\|/-\|'
 	koca_spin[1]='|>=<|<=>' 
 	koca_spin[2]='O○·○'
+	koca_spin[3]='[{(|)}]'
 	case $spin in
 		[0-9]) ;;
 		 list) for n in ${!koca_spin[*]} ; do echo "$n:${koca_spin[$n]}" ; done ; return ;;
@@ -14,7 +15,12 @@ function koca_spin {	# Display a spinning cursor or scrolling text
 	esac
 	if [ $length -gt ${#koca_spin[$spin]} ]
 	then
-		echo "[__libname__] Lenght ($length) must not be greater than the string length (${#koca_spin[$spin]})" >&2
+		echo "[__libname__] Length ($length) must not be greater than the string length (${#koca_spin[$spin]})" >&2
+		return 1
+	fi
+	if ! [[ $dir =~ [01$] ]] 
+	then
+		echo "[__libname__] Direction must be -1, 0 or 1, not $dir" >&2
 		return 1
 	fi
 	[ $spin -ge ${#koca_spin[*]} ] && spin=0
