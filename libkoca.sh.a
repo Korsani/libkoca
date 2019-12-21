@@ -31,6 +31,19 @@ function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
 
 	echo "${w}"
 }
+function koca_banner() {	# Display string in a banner way: chars one by one, at givent speed
+    local str="$1"
+    local speed="$2"
+	[ -z "$str" ] && return 1
+    [ -z "$speed" ] && speed=500
+    w=$(echo "scale=10;1/$speed" | bc)
+    for n in $(seq 0 ${#str})
+    do
+        echo -en "\r${str:0:$n}"
+        sleep $w
+    done
+	echo
+}
 # Check wether specified file can be found, warn or exit according it's a MAY or a MUST
 # Initialize the variable with the path of the correspondant file, if the file is found
 # Initialize the variable with 'echo <commande>' if the file is not found
@@ -629,20 +642,48 @@ function s2dhms {	# seconds to day hour min sec, or xx:xx:xx if -I. Return NaN o
 	fi
 }
 #http://is.gd/qQc5ab
-function koca_spin {	# Display a spinning cursor
-	spin=${1:-0}
+function koca_spin {	# Display a spinning cursor or scrolling text
+	local spin=${1:-0}
+	local dir=${2:-1}
+	local length=${3:-1}
 	declare -A koca_spin
 	koca_spin[0]='/-\|/-\|'
 	koca_spin[1]='|>=<|<=>' 
 	koca_spin[2]='O○·○'
+	koca_spin[3]='[{(|)}]'
 	case $spin in
 		[0-9]) ;;
-		   list) for n in ${!koca_spin[*]} ; do echo "$n:${koca_spin[$n]}" ; done ; return ;;
-			*) koca_spin[0]=$1 ; spin=0 ;;
+		 list) for n in ${!koca_spin[*]} ; do echo "$n:${koca_spin[$n]}" ; done ; return ;;
+		    *) koca_spin[0]="$1" ; spin=0 ;;
 	esac
+	if [ $length -gt ${#koca_spin[$spin]} ]
+	then
+		echo "[libkoca.sh] Length ($length) must not be greater than the string length (${#koca_spin[$spin]})" >&2
+		return 1
+	fi
+	if ! [[ $dir =~ [01$] ]] 
+	then
+		echo "[libkoca.sh] Direction must be -1, 0 or 1, not $dir" >&2
+		return 1
+	fi
 	[ $spin -ge ${#koca_spin[*]} ] && spin=0
-	printf "\b"${koca_spin[$spin]:$koca_spin_pos:1} 
-    (( koca_spin_pos=(koca_spin_pos +1)%${#koca_spin[$spin]} ))
+	declare -a index
+	# Make equation easier to write
+	a=$dir ; n=${#koca_spin[$spin]}-$length
+	[ $dir -eq 0 ] && a=1	# Deal with that case later
+	# Build index of position from where to write
+	# Nii... Make first term to 0 when a=1, n when a=-1
+	index=( $(seq $((a*n*(a-1)/2)) $a $((n-a*n*(a-1)/2)) ) )
+	if [ $dir -eq 0 ] 		# Bouncing: generate the same sequence, backward, starting from n-1, till 1 (as sequence start with 0)
+	then
+		index=( ${index[@]} $(seq $((n-1)) -1 1) )
+	fi
+	# Display $length car, starting from somewhere 
+	printf "\r${koca_spin[$spin]:${index[$koca_spin_pos]}:$length}"
+	# Moving forward in index
+	(( koca_spin_pos=(koca_spin_pos+1)%${#index[@]} ))
+	# Mmm...
+	return 0
 }
 function whereAmI {
 	pushd . >/dev/null
