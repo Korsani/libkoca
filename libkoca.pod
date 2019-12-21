@@ -36,6 +36,20 @@ Examples:
 	$ size=$(koca_b2gmk 12345)B; echo $size
 	12.0kB
 
+=head2 koca_banner
+
+Display a string in a banner fashion: cahrs one by one, at givent speed
+
+Usage:
+
+	koca_banner <string> <speed>
+
+B<speed> a in char per second. Default is 500.
+
+Example:
+
+	koca_banner 'Forget me not' 10
+
 
 =head2 checkNeededFiles
 
