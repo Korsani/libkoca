@@ -38,17 +38,25 @@ Examples:
 
 =head2 koca_banner
 
-Display a string in a banner fashion: cahrs one by one, at givent speed
+Display a string in a banner fashion: chars one by one, at given speed
 
 Usage:
 
 	koca_banner <string> <speed>
 
-B<speed> a in char per second. Default is 500.
+If B<speed> is suffixed by s, or not suffixed, the string will take B<speed> seconds to be printed.
+
+If B<speed> is suffixed by cps, B<speed> characters per second will be printed.
+
+Default is 30cps.
+
+Spaces does not count.
 
 Example:
 
-	koca_banner 'Forget me not' 10
+	koca_banner 'Forget me not' 1
+	koca_banner 'Forget me not' 5s
+	koca_banner 'Forget me not' 10cps
 
 
 =head2 checkNeededFiles
