@@ -38,25 +38,30 @@ Examples:
 
 =head2 koca_banner
 
-Display a string in a banner fashion: chars one by one, at given speed
+Display a string or a file in a banner fashion: chars one by one, at given speed
 
 Usage:
 
-	koca_banner <string> <speed>
+	koca_banner [@]<string> <speed>
 
-If B<speed> is suffixed by s, or not suffixed, the string will take B<speed> seconds to be printed.
+If B<speed> is suffixed by s, or not suffixed, the string will take B<speed> seconds to be printed. In this case, B<speed> can be a float.
 
-If B<speed> is suffixed by cps, B<speed> characters per second will be printed.
+If B<speed> is suffixed by cps, B<speed> characters per second will be printed. In this case, speed can only be integer
 
-Default is 30cps.
+If B<string> is prefixed by @, it will be considered as a file. Thus, speed, if in seconds, file will be displayed in that time. If speed is in cps, file will be displayed at that cps.
 
-Spaces does not count.
+Default is B<30cps>.
+
+Spaces are not counted when displaying. Than means tha 'a a' and 'aa' will be displayed at the same speed.
+
+Please note that is speed is too fast, or string or file to display too long, time take to display could be longer. For example C<koca_banner @/etc/hosts 1> will not take 1s.
 
 Example:
 
 	koca_banner 'Forget me not' 1
 	koca_banner 'Forget me not' 5s
-	koca_banner 'Forget me not' 10cps
+	koca_banner "Les sanglots longs des violons de l'automne blaissent mon coeur d'une langueur monotone" 60cps
+	koca_banner @/etc/hosts 0.5
 
 
 =head2 checkNeededFiles

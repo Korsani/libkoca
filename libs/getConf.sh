@@ -28,7 +28,7 @@ _getConfIsReadable() {
 }
 # Deprecated
 getConf() {
-	echo "[__libname__)] Please use getConfValue" >&2
+	echo "[__libname__] Please use getConfValue" >&2
 	echo "$(date -u +%Y%m%d%H%M%SZ) : $(cd $(dirname \"$0\") ; pwd)/$(basename \"$0\") : getConf" >> /var/libkoca/stats
 	getConfValue "$*"
 }

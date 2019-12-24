@@ -6,8 +6,15 @@ source $(cd $(dirname "$0") ; pwd)/bootstrap.sh
 export lock=/tmp/$$
 TMPDIR=${TMPDIR:=/tmp}
 testBanner() {
-	# testing visual stuff, uh?
-	koca_banner >/dev/null; r=$?
-	assertFalse "Should return false" "$r"
+	koca_banner 'plop' rt 2>/dev/null ; _ec=$? ; assertFalse "Did not return false upon wrong speed" $_ec
+	koca_banner 'plop' 100lo 2>/dev/null ; _ec=$? ; assertFalse "Did not return false upon wrong speed" $_ec
+	koca_banner 'plop' 100cp 2>/dev/null ; _ec=$? ; assertFalse "Did not return false upon wrong speed" $_ec
+	koca_banner 'plop' 100cps 2>/dev/null ; _ec=$? ; assertTrue "Did not return true" $_ec
+	koca_banner 'plop' 0.1cps 2>/dev/null ; _ec=$? ; assertFalse "Did not return false" $_ec
+	koca_banner 'plop' 1 2>/dev/null ; _ec=$? ; assertTrue "Did not return true" $_ec
+	koca_banner 'plop' 0,5 2>/dev/null ; _ec=$? ; assertTrue "Did not return true" $_ec
+	koca_banner 'plop' 0.5 2>/dev/null ; _ec=$? ; assertTrue "Did not return true" $_ec
+	koca_banner 'plop' .5 2>/dev/null ; _ec=$? ; assertTrue "Did not return true" $_ec
+	koca_banner 'plop' 0.53 2>/dev/null ; _ec=$? ; assertTrue "Did not return true" $_ec
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh
