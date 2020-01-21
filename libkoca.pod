@@ -175,6 +175,20 @@ Example:
 
 	$ koca_isLocked && echo "I already exists"
 
+=head2 koca_progress
+
+Display a (non blocking) progress bar
+
+Usage:
+
+	koca_progress <n> <string>
+
+B<n> is the progress, in %
+
+Examples:
+
+	# koca_progress 10 "ETA: 10s"
+
 =head2 underSudo
 
 Return wether the calling script is run under sudo.

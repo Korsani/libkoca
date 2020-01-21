@@ -77,6 +77,7 @@ $(WWW_DIR)/$(FN): $(FN) /var/www/files
 	install -o www-data -m0644 $< $@
 
 $(MAN_DIR)/$(MAN_PAGE).gz: libkoca.$(MAN_SECTION)
+	mkdir -p $(MAN_DIR)
 	gzip -c $< > $@
 	chmod 0644 $@
 	$(info Man page installed)
