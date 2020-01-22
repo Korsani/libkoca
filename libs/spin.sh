@@ -25,9 +25,9 @@ function koca_spin {	# Display a spinning cursor or scrolling text. Usage: $0 [ 
 		return 1
 	fi
 	[ $spin -ge ${#koca_spin[*]} ] && spin=0
-	declare -a index
+	declare -a index ; local index
 	# Make equation easier to write
-	a=$dir ; n=${#koca_spin[$spin]}-$length
+	local a=$dir ; local n=${#koca_spin[$spin]}-$length
 	[ $dir -eq 0 ] && a=1	# Deal with that case later
 	# Build index of position from where to write
 	# Nii... Make first term to 0 when a=1, n when a=-1
