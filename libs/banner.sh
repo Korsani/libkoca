@@ -1,4 +1,4 @@
-function koca_banner() {	# Display string in a banner way: chars one by one, at givent speed
+function koca_banner() {	# Display string in a banner way: chars one by one, at givent speed. Usage: $0 [@]<string> <float>
 	local _disp
 	function _disp() {
 		local str="$1"
@@ -11,7 +11,7 @@ function koca_banner() {	# Display string in a banner way: chars one by one, at 
 		echo
 	}
 	# How long a loop take?
-	w=0; t_loop=$((time _disp n) 2>&1 | grep real | sed -e 's/.*m\([0-9]*\).\([0-9]*\)s/\1.\2/')
+	local w=0; local t_loop=$((time _disp n) 2>&1 | grep real | sed -e 's/.*m\([0-9]*\).\([0-9]*\)s/\1.\2/')
     local str="$1"		# Can be a string, file and suffixed by @speed
     local uspeed="$2"	# Speed given by user
 	local speed_cps

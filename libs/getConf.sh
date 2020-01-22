@@ -1,15 +1,9 @@
 _getConfGetSedOption() {
 	local opt
 	case $(uname -s) in
-        Darwin|FreeBSD)
-        opt=E
-        ;;
-        OpenBSD)
-        opt=''
-        ;;
-        Linux|*)
-        opt=r
-        ;;
+        Darwin|FreeBSD)	opt='E' ;;
+        OpenBSD)        opt='';;
+        Linux|*)		opt='r' ;;
     esac
 	echo $opt
 }
@@ -35,7 +29,7 @@ getConf() {
 # Return values from a configuration file passed in $KOCA_CONF variable
 # format of conf file : section.key=value
 # Usage : getConfValue <section> <key>
-function getConfValue {
+function getConfValue {	# Get a the value corresponding to a key from a conf file. Usage: $0 <key>
 ## link: ## _getConfGetSedOption ##
 ## link: ## _getConfIsReadable ##
 	# hey hey, dynamic linking :)

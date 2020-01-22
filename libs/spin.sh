@@ -1,9 +1,9 @@
 #http://is.gd/qQc5ab
-function koca_spin {	# Display a spinning cursor or scrolling text
+function koca_spin {	# Display a spinning cursor or scrolling text. Usage: $0 [ <int|string> [ <-1|0|1> [ <int> ] ] ]. $0 list
 	local spin=${1:-0}
 	local dir=${2:-1}
 	local length=${3:-1}
-	declare -A koca_spin
+	declare -A koca_spin ; local koca_spin
 	koca_spin[0]='/-\|/-\|'
 	koca_spin[1]='|>=<|<=>' 
 	koca_spin[2]='O○·○'

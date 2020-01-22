@@ -1,4 +1,4 @@
-function dhms2s {	# day hour min sec to seconds
+function dhms2s {	# Convert a 'day hour min sec' string to seconds. Usage: $0 <string>
 	# can be specified in any order :
 	# 1d1s is the same as 1s1d
 	w=$1

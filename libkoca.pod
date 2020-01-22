@@ -68,6 +68,8 @@ Example:
 
 Check wether given file exists. 'may' or 'must' change only the error message. Exit code is 1 if file is not found.
 
+It file is found, a variable named the same as the file is initialized with the path to the file.
+
 Usage:
 
 	checkNeededFiles may|must <file> [ <file> [ <file> [ ... ] ]
@@ -78,8 +80,9 @@ Examples:
 	[libkoca.sh] 'ffmpeg' not found. Bad things may happen
 	$ checkNeededFiles must ffmpeg
 	[libkoca.sh] 'gna' not found. Bad things WILL happen
-
-
+	$ checkNeededFiles must bash ; echo $bash
+	/usr/bin/bash
+	
 =head2 koca_cleanOnExit
 
 Remove specified file on script exit.
@@ -177,7 +180,9 @@ Example:
 
 =head2 koca_progress
 
-Display a (non blocking) progress bar
+Display a (non blocking) progress bar.
+
+Unlike pv(1), B<koca_progress> do not pipe data from input to output, nor calculate ETA, throughput or such. It act more like dialog(1) B<--mixedgauge>, taking the whole terminal width.
 
 Usage:
 
@@ -185,9 +190,12 @@ Usage:
 
 B<n> is the progress, in %
 
+B<string> is a an arbitrary string you want to put after the progress bar.
+
 Examples:
 
 	# koca_progress 10 "ETA: 10s"
+10%  [######_________________________|________________________________]ETA: 10s
 
 =head2 underSudo
 
@@ -378,7 +386,7 @@ Join lines from STDIN, as so many 'join' commands in other languages.
 
 Usage:
 
-	koca_join [ <glue string> ]
+	koca_join <glue>
 
 Example:
 

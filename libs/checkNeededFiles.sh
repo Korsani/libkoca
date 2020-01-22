@@ -11,16 +11,13 @@
 # > checkNeededFiles may conntrack # supposing conntrack is is not installed
 # > $conntrack -D -s 1.1.1.1
 # > conntrack -D -s 1.1.1.1
-function checkNeededFiles {
+function checkNeededFiles {	# Check wether file can be found. Usage: $0 must|may <file>
 	local _ec=0
 	while [ -n "$1" ]
 	do
 		case $1 in
-			-q)
-				local quiet='yes'
-				;;
-			may|must)
-				type=$1;;
+			-q) 		local quiet='yes';;
+			may|must)	type=$1;;
 			*)
 				if ! type -p "$1" >/dev/null 2>&1
 				then

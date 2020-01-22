@@ -8,7 +8,7 @@
 #   $a will contain then the code of red, then a star, then the code of reset. Thus, echo "$a plop" will display a red star, followed by the string "plop"
 # getColor list to get available colors. Output is colored only if it is a terminal.
 # Example : getColor _g higreen _re reset _w white _p hipurple _r hired
-function getColor { # Return a specified color code in a specified var
+function getColor { # Return a specified color code in a specified var. Usage: $0 <var>[+] <colorname>. $0 list
 	if [ ! -t 0 ]
 	then
 		return
@@ -19,7 +19,7 @@ function getColor { # Return a specified color code in a specified var
     local bold=bold
     local reset=sgr0
 	# but FreeBSD doesn't use terminfo
-	if [ "$(uname)" = "FreeBSD" ]
+	if [ "$(uname)" == "FreeBSD" ]
 	then
 		tput_af=AF
 		tput_ab=AB

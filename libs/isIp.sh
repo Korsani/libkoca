@@ -1,4 +1,4 @@
-function isIp { # return true if parameter is an IPv4/IPv6 address
+function isIp { # return true if parameter is an IPv4/IPv6 address. Usage: $0 <string>
 	#echo "$1" | grep -q -E '^[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}$'
 	local isv4=0
 	local isv6=0

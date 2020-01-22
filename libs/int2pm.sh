@@ -1,5 +1,5 @@
 # Return the number converted in +/- scale
-function koca_int2pm { # return +, ++, +++ (or -). <value> [ <max> [ <length> [ 'gauge' [ <sign+><sign-> ] ] ] ]
+function koca_int2pm { # return +, ++, +++ (or -). Usage: $0 <value> [ <max> [ <length> [ 'gauge' [ <sign+><sign-> ] ] ] ]
 	local val="$1"
 	local MAX=3
 	local LENGTH=3

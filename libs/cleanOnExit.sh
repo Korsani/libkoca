@@ -13,7 +13,7 @@
 # $ . plop
 # $ f
 # Le fichier temporaire ne sera jamais effacé
-function koca_cleanOnExit { # Remove specified file on script exit
+function koca_cleanOnExit { # Remove specified file on script exit. Usage: $0 <file>
 	local file
 	for file in "$@"
 	do

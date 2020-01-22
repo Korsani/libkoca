@@ -1,4 +1,4 @@
-function s2dhms {	# seconds to day hour min sec, or xx:xx:xx if -I. Return NaN or Oor if error
+function s2dhms {	# Convert seconds to day hour min sec, or xx:xx:xx if -I. Usage: $0 <int>
 	if [ "$1" == '-I' ]
 	then
 		FORMAT='I'

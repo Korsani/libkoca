@@ -5,7 +5,7 @@
 # lockMe [ -q ] <fichier de lock> [ timeout ]
 # -q : sort silencieusement si le timeout expire
 # PS: le fichier ne devrait pas etre un `mktemp`, sinon ca risque pas de marcher cm prevu :)
-function koca_lockMe { # Lock the calling script on the specified file
+function koca_lockMe { # Lock the calling script with the specified file. Usage: $0 <file>
 	local src=__libkoca__ ; [ -e "$src" ] && eval "$(bash "$src" koca_cleanOnExit)"
 	local quiet=0
 	[ "$1" = "-q" ] && quiet=1 && shift
@@ -54,14 +54,14 @@ function koca_lockMe { # Lock the calling script on the specified file
 		return 0
 	fi
 }
-function koca_unlockMe { # unlock
+function koca_unlockMe { # Remove the lock. Usage: $0 <file>
 	rm -f "$1"
-	[ ! -e "$1" ]
+	! [ -a "$1" ]
 }
 # Retourne 1 si le script a été locké par le fonction ci-dessus
 # Retourne 0 sinon
-function koca_isLocked {
-	lock="$1"
-	[ -e "$lock" ] && return 0
+function koca_isLocked {	# Check wether lock exists
+	local lock="$1"
+	[ -a "$lock" ] && return 0
 	return 1
 }
