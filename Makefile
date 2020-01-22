@@ -67,7 +67,8 @@ install: $(PREFIX)/include/$(FN) $(MAN_DIR)/$(MAN_PAGE).gz
 endif
 
 $(PREFIX)/include/$(FN): $(FN)
-	install -D -m0644 $< $@
+	mkdir -p $(PREFIX)/include
+	install -m0644 $< $@
 	rm -f $(PREFIX)/include/commun.sh
 	$(ECHO) 'echo "Unused" >&2' > $(PREFIX)/include/commun.sh
 	$(info Installed in $(PREFIX)/include)
