@@ -1,4 +1,4 @@
-function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta). Usage: $0 <integer>
+function koca_b2gmk {	# Convert byte to giga, mega, kilo (tera, peta). Usage: $0 <integer>
 	w="$1"
 	if ! [[ "$w" =~ ^[0-9]+$ ]]
 	then
