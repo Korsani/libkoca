@@ -14,5 +14,5 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	# On FreeBSD, head complainx when -c 0
 	s=$(printf "\r%-4s [%s%s]%s" $progress% "$(head -c $fill < /dev/zero 2>/dev/null | tr '\0' '#')" "$(head -c $empty < /dev/zero 2>/dev/null| tr '\0' '_')" "$suf")
 	# Display a | in the middle
-	echo "${s:0:7+$half-1}|${s:7+$half}"
+	printf "%s|%s" "${s:0:7+$half-1}" "${s:7+$half}"
 }
