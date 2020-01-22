@@ -11,9 +11,10 @@ function koca_load() { # Return true if load is less or equals to specified floa
 	then
 		# Uptime is cross-plateform. cat /proc/loadavg is not
 		# LANG=C make '.' the decimal separator
-		return  $(bc <<< "$(LANG=C uptime | awk -F "${ftext[$OS]}" '{ print $2 }' | cut -d, -f1) > $1")
+		u=$(LANG=C uptime | perl -ne 's/.*: (\d+\.\d+).*/$1/;print')
+		return $(echo "$u > $1"|bc) 
 	else
-		echo "[__libname__] '$1' is not a float or int" >&2
+		echo "[__libname__] '$1' is not a float or an int" >&2
 		return 2
 	fi
 }
