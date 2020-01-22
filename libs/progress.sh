@@ -1,18 +1,24 @@
-function koca_progress {    # Display a non blocking not piped progress. Usage: $0 <progress%> <string>
+function koca_progress {    # Display a non blocking not piped progress. Usage: $0 <progress%> <string> [ <int> ]
 	local COLUMNS=$(tput cols)
 	LANG=C  		        # avoid ./, mistake
-	local progress="$1" ;
-	[[ $progress =~ ^[0-9]+$ ]] || return 1	# should also catch negative numbres
-	[ $progress -gt 100 ] && return 2
+	local progress="$1" ;[[ $progress =~ ^[0-9]+$ ]] || return 1; [ $progress -gt 100 ] && return 2
 	local suf="$2"
+	local NSLICES=${3:-2};[[ $NSLICES =~ ^[0-9]+$ ]] || return 1 
 	local SPARSE=$(expr 7 + ${#suf})    # 'xxx% '(5) '['(1) ']'(1)
+	local slice_size=$(expr \( $COLUMNS - $SPARSE \) \/ $NSLICES)
 	local RATIO=$(echo "scale=2;($COLUMNS-$SPARSE)/100"| bc)
 	#printf "\r%-4s [" "$progress%"
 	local fill=$(printf '%.0f' $(echo "scale=0;$progress*$RATIO"|bc))
 	local empty=$(expr $COLUMNS - $SPARSE - $fill )
-	local half=$(expr \( $COLUMNS - $SPARSE \) \/ 2)
 	# On FreeBSD, head complainx when -c 0
-	s=$(printf "\r%-4s [%s%s]%s" $progress% "$(head -c $fill < /dev/zero 2>/dev/null | tr '\0' '#')" "$(head -c $empty < /dev/zero 2>/dev/null| tr '\0' '_')" "$suf")
-	# Display a | in the middle
-	printf "%s|%s" "${s:0:7+$half-1}" "${s:7+$half}"
+	#s=$(printf "\r%-4s [%s%s]%s" $progress% "$(head -c $fill < /dev/zero 2>/dev/null | tr '\0' '#')" "$(head -c $empty < /dev/zero 2>/dev/null| tr '\0' '_')" "$suf")
+	local bar=$(printf "%s%s" "$(head -c $fill < /dev/zero 2>/dev/null | tr '\0' '#')" "$(head -c $empty < /dev/zero 2>/dev/null| tr '\0' '_')")
+	# Display |
+	printf "\r%-4s [" "$progress%"
+	for p in $(seq 0 $(( $NSLICES-2 )) )
+	do
+		echo -n "${bar:$slice_size*$p:$slice_size}"
+		echo -n "|"
+	done
+	echo -n "${bar:$(($slice_size * ($NSLICES-1))):$slice_size-1}]$suf"
 }

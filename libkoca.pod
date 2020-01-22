@@ -82,7 +82,7 @@ Examples:
 	[libkoca.sh] 'gna' not found. Bad things WILL happen
 	$ checkNeededFiles must bash ; echo $bash
 	/usr/bin/bash
-	
+
 =head2 koca_cleanOnExit
 
 Remove specified file on script exit.
@@ -186,16 +186,20 @@ Unlike pv(1), B<koca_progress> do not pipe data from input to output, nor calcul
 
 Usage:
 
-	koca_progress <n> <string>
+	koca_progress <n> <string> [ <slices> ]
 
 B<n> is the progress, in %
 
 B<string> is a an arbitrary string you want to put after the progress bar.
 
+B<parts> is the number of slices you want the bar to have. Default to 2
+
 Examples:
 
 	# koca_progress 10 "ETA: 10s"
 10%  [######_________________________|________________________________]ETA: 10s
+	# koca_progress 10 "ETA: 10s" 3
+10%  [######______________|_____________________|_____________________]ETA: 10s
 
 =head2 underSudo
 
