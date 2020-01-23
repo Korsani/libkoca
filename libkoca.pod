@@ -182,7 +182,7 @@ Example:
 
 Display a (non blocking) progress bar.
 
-Unlike pv(1), B<koca_progress> do not pipe data from input to output, nor calculate ETA, throughput or such. It act more like dialog(1) B<--mixedgauge>, taking the whole terminal width.
+Unlike pv(1), B<koca_progress> do not pipe data from input to output, nor calculate ETA, throughput or such. It act more like dialog(1) B<--mixedgauge>, taking the whole terminal width (blank padding)
 
 Usage:
 

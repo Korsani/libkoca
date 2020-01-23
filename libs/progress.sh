@@ -14,11 +14,12 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	#s=$(printf "\r%-4s [%s%s]%s" $progress% "$(head -c $fill < /dev/zero 2>/dev/null | tr '\0' '#')" "$(head -c $empty < /dev/zero 2>/dev/null| tr '\0' '_')" "$suf")
 	local bar=$(printf "%s%s" "$(head -c $fill < /dev/zero 2>/dev/null | tr '\0' '#')" "$(head -c $empty < /dev/zero 2>/dev/null| tr '\0' '_')")
 	# Display |
-	printf "\r%-4s [" "$progress%"
+	local s=$(printf "\r%-4s [" "$progress%")
 	for p in $(seq 0 $(( $NSLICES-2 )) )
 	do
-		echo -n "${bar:$slice_size*$p:$slice_size-1}"
-		echo -n "|"
+		s="$s${bar:$slice_size*$p:$slice_size-1}"
+		s="$s|"
 	done
-	echo -n "${bar:$(($slice_size * ($NSLICES-1))):$slice_size-1}]$suf"
+	s="$s${bar:$(($slice_size * ($NSLICES-1))):$slice_size}]$suf"
+	printf "%-$((COLUMNS+1))s" "$s"
 }
