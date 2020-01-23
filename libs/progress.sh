@@ -2,7 +2,7 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	local COLUMNS=$(tput cols)
 	LANG=C  		        # avoid ./, mistake
 	local progress="$1" ;[[ $progress =~ ^[0-9]+$ ]] || return 1; [ $progress -gt 100 ] && return 2
-	local suf="$2"
+	local suf="$2" 
 	local NSLICES=${3:-2};[[ $NSLICES =~ ^[0-9]+$ ]] || return 1 
 	local SPARSE=$(expr 7 + ${#suf})    # 'xxx% '(5) '['(1) ']'(1)
 	local slice_size=$(expr \( $COLUMNS - $SPARSE \) \/ $NSLICES)
@@ -17,7 +17,7 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	printf "\r%-4s [" "$progress%"
 	for p in $(seq 0 $(( $NSLICES-2 )) )
 	do
-		echo -n "${bar:$slice_size*$p:$slice_size}"
+		echo -n "${bar:$slice_size*$p:$slice_size-1}"
 		echo -n "|"
 	done
 	echo -n "${bar:$(($slice_size * ($NSLICES-1))):$slice_size-1}]$suf"
