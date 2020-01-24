@@ -4,26 +4,21 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	local progress="$1" ;[[ $progress =~ ^[0-9]+$ ]] || return 1; [ $progress -gt 100 ] && return 2
 	local suf="$2" 
 	local NSLICES=${3:-2};[[ $NSLICES =~ ^[0-9]+$ ]] || return 1 
-	local SPARSE=$(expr 7 + ${#suf})    # 'xxx% '(5) '['(1) ']'(1)
-	local slice_size=$(expr \( $COLUMNS - $SPARSE \) \/ $NSLICES)
-	# Do all the math in bc, thus save some forks...
-	declare -a barfullness
-	local barfullness=($(echo "scale=0;f=$progress*($COLUMNS-$SPARSE)/100;e=($COLUMNS-$SPARSE-f);print f,\" \",e"|bc))
-	# On FreeBSD, head complainx when -c 0
-	local bar=$(printf "%s%s" "$(head -c ${barfullness[0]} < /dev/zero 2>/dev/null | tr '\0' '#')" "$(head -c ${barfullness[1]} < /dev/zero 2>/dev/null| tr '\0' '_')")
-	# - How to put a char at a specific pos in a string, as quick as possible? Please avoid sed blabla stuf...
-	# - Hold my beer
-	declare -a magic
-	# Transform a string in array
-	local magic=($(echo $bar | sed -e 's/\(.\)/\1 /g'))
-	# put | at specific pos in the array
-	for marker_pos in $(seq 1 $(( NSLICES-1 )) )
-	do
-		magic[$[marker_pos*slice_size]]='|'
-	done
-	# Array back in string
-	bar=$(echo ${magic[@]} | tr -d ' ')
-	local s=$(printf "\r%-4s [%s]%s" "$progress%" "$bar" "$suf" )
-	# Guarantee to fill with blanks
-	printf "%-$((COLUMNS+1))s" "$s"
+	# Perl is 3x faster, and much more easier to implement...
+	perl - $progress $suf $NSLICES $COLUMNS << 'EOP'
+	my $p=shift;
+	my $s=shift;
+	my $nslices=shift;
+	my $cols=shift;
+	my $sparse=7+length($s);
+	my $scale=($cols-$sparse)/100;
+	my $slice_length=length($bar)/$nslices;
+	# Build the bar
+	my $bar='#'x($p*$scale);
+	$bar.='_'x((100-$p)*$scale);
+	# Put the | on the bar
+	map {substr($bar,$slice_length*$_,1,'|')} (1..($nslices-1));
+	# Print
+	printf "\r%-4s [%s]%-".(length($s)+1)."s","${p}%",$bar,$s;
+EOP
 }
