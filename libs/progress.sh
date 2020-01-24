@@ -12,10 +12,10 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	my $cols=shift;
 	my $sparse=7+length($s);
 	my $scale=($cols-$sparse)/100;
-	my $slice_length=length($bar)/$nslices;
 	# Build the bar
 	my $bar='#'x($p*$scale);
 	$bar.='_'x((100-$p)*$scale);
+	my $slice_length=length($bar)/$nslices;
 	# Put the | on the bar
 	map {substr($bar,$slice_length*$_,1,'|')} (1..($nslices-1));
 	# Print
