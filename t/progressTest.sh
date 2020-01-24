@@ -7,5 +7,6 @@ testprogress()  {
 	s=$(koca_progress '101' 'a');assertFalse "More than 100%" $?
 	s=$(koca_progress '-1' 'a');assertFalse "Less than 0" $?
 	s=$(koca_progress 'a' 'a');assertFalse "Not a number" $?
+	s=$(koca_progress 10 'a' 2);assertEquals "$(tput cols)" "${#s}";
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh
