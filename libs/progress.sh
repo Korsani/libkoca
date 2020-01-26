@@ -6,13 +6,14 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	local NSLICES=${3:-2};[[ $NSLICES =~ ^[0-9]+$ ]] || return 1 
 	# Perl is 3x faster, and much more easier to implement...
 	# -CAS make perl assume ARGV and code are utf8
-	perl -CAS - "$progress" "$suf" "$NSLICES" "$COLUMNS" << 'EOP'
+	perl -CAS -MEncode - "$progress" "$suf" "$NSLICES" "$COLUMNS" << 'EOP'
 	use utf8;
+	use Encode qw( encode_utf8 );
 	#my $chars='░▒▓█';
 	my $chars='▏▎▍▌▋▊▉█';
 	my $nchars=length($chars);
 	(my $p, my $s, my $nslices, my $cols)=@ARGV;
-	my $sparse=7+length($s);
+	my $sparse=7+length(encode_utf8($s));
 	my $scale=($cols-$sparse)/100;
 	# convert progress into char position
 	$p_scaled=($p*$scale);
@@ -27,6 +28,6 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	# But not on filled part
 	map {substr($bar,$slice_length*$_,1,'|')} (1+int($p_scaled/$slice_length)..($nslices-1));
 	# Print
-	printf "\r%-4s [%s]%-".length($s)."s","${p}%",$bar,$s;
+	printf "\r%-4s [%s]%.".(length($s))."s","${p}%",$bar,$s;
 EOP
 }
