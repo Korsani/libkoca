@@ -67,6 +67,8 @@ If you want a specific function:
 ## Acknowledgments
 
 * Tested on Linux, FreeBSD, Darwin (MacOS)
+* Code is probably not as clean as it should be...
+* But should be fast (I merely develop on rpi and slow computers). If you have faster ways of doing the same things, please send a PR!
 
 # List of functions
 
