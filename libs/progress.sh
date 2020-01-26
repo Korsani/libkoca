@@ -16,17 +16,20 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	my $cols=shift;
 	my $sparse=7+length($s);
 	my $scale=$nchars*($cols-$sparse)/100;
-	# Build the bar
+	# convert progress into char position
 	$p_scaled=($p*$scale)/$nchars;
-	my $bar=substr($chars,$nchars-1,1)x(int($p_scaled)-1);
-	my $arrow=substr($chars,$nchars*($p_scaled-int($p_scaled)-1),1),"\n";
+	# Build the bar: fill with x plain char
+	my $bar=substr($chars,$nchars-1,1)x(int($p_scaled));
+	#print $nchars*($p_scaled-int($p_scaled)),"\n";
+	my $narrow=$nchars*($p_scaled-int($p_scaled));
+	my $arrow=$narrow==0?'':substr($chars,$narrow,1);
 	$bar.=$arrow;
-	$bar.=' 'x(1+(100-$p)*$scale/$nchars);
+	$bar.=' 'x(((100-$p)*$scale/$nchars));
 	my $slice_length=length($bar)/$nslices;
 	# Put the | on the bar
 	# But not on filled part
 	map {substr($bar,$slice_length*$_,1,'|')} (1+int($p_scaled/$slice_length)..($nslices-1));
 	# Print
-	printf "\r%-4s[%s]%-".length($s)."s","${p}%",$bar,$s;
+	printf "\r%-4s [%s]%-".length($s)."s","${p}%",$bar,$s;
 EOP
 }
