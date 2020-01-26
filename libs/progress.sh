@@ -13,7 +13,8 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	my $chars='▏▎▍▌▋▊▉█';
 	my $nchars=length($chars);
 	(my $p, my $s, my $nslices, my $cols)=@ARGV;
-	my $sparse=7+length(encode_utf8($s));
+	my $mb_length=length(encode_utf8($s))-length($s);
+	my $sparse=7+length($s)+$mb_length/2;	#Roughtly...
 	my $scale=($cols-$sparse)/100;
 	# convert progress into char position
 	$p_scaled=($p*$scale);
@@ -28,6 +29,6 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	# But not on filled part
 	map {substr($bar,$slice_length*$_,1,'|')} (1+int($p_scaled/$slice_length)..($nslices-1));
 	# Print
-	printf "\r%-4s [%s]%.".(length($s))."s","${p}%",$bar,$s;
+	printf "\r%-4s [%s]%-.".(length($s))."s","${p}%",$bar,$s;
 EOP
 }
