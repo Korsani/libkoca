@@ -9,9 +9,6 @@ function koca_spin {	# Display a spinning cursor or scrolling text. Usage: $0 [ 
 	koca_spin[2]='O○·○'
 	koca_spin[3]='[{(|)}]'
 	koca_spin[4]='.oOo'
-	koca_spin[5]='🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛'
-	koca_spin[6]='🌑🌒🌓🌔🌕🌖🌗🌘'
-	koca_spin[7]='▖▘▝▖'
 	case $spin in
 		[0-9]) ;;
 		 list) for n in ${!koca_spin[*]} ; do echo "$n:${koca_spin[$n]}" ; done ; return ;;
@@ -40,7 +37,7 @@ function koca_spin {	# Display a spinning cursor or scrolling text. Usage: $0 [ 
 		index=( ${index[@]} $(seq $((n-1)) -1 1) )
 	fi
 	# Display $length car, starting from somewhere 
-	printf "%s\r" "${koca_spin[$spin]:${index[$koca_spin_pos]}:$length}"
+	printf "\r%s" "${koca_spin[$spin]:${index[$koca_spin_pos]}:$length}"
 	# Moving forward in index
 	(( koca_spin_pos=(koca_spin_pos+1)%${#index[@]} ))
 	# Mmm...
