@@ -5,26 +5,23 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	local suf="$2" 
 	local NSLICES=${3:-2};[[ $NSLICES =~ ^[0-9]+$ ]] || return 1 
 	# Perl is 3x faster, and much more easier to implement...
-	perl -CS - "$progress" "$suf" "$NSLICES" "$COLUMNS" << 'EOP'
+	# -CAS make perl assume ARGV and code are utf8
+	perl -CAS - "$progress" "$suf" "$NSLICES" "$COLUMNS" << 'EOP'
 	use utf8;
 	#my $chars='░▒▓█';
 	my $chars='▏▎▍▌▋▊▉█';
 	my $nchars=length($chars);
-	my $p=shift;
-	my $s=shift;
-	my $nslices=shift;
-	my $cols=shift;
+	(my $p, my $s, my $nslices, my $cols)=@ARGV;
 	my $sparse=7+length($s);
-	my $scale=$nchars*($cols-$sparse)/100;
+	my $scale=($cols-$sparse)/100;
 	# convert progress into char position
-	$p_scaled=($p*$scale)/$nchars;
+	$p_scaled=($p*$scale);
 	# Build the bar: fill with x plain char
 	my $bar=substr($chars,$nchars-1,1)x(int($p_scaled));
-	#print $nchars*($p_scaled-int($p_scaled)),"\n";
 	my $narrow=$nchars*($p_scaled-int($p_scaled));
 	my $arrow=$narrow==0?'':substr($chars,$narrow,1);
 	$bar.=$arrow;
-	$bar.=' 'x(((100-$p)*$scale/$nchars));
+	$bar.=' 'x(((100-$p)*$scale));
 	my $slice_length=length($bar)/$nslices;
 	# Put the | on the bar
 	# But not on filled part
