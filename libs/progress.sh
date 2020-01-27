@@ -26,8 +26,8 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	$bar.=' 'x(((100-$p)*$scale));
 	my $slice_length=length($bar)/$nslices;
 	# Put the | on the bar
-	# But not on filled part
-	map {substr($bar,$slice_length*$_,1,'|')} (1+int($p_scaled/$slice_length)..($nslices-1));
+	#map {substr($bar,$slice_length*$_,1,'|')} (1+int($p_scaled/$slice_length)..($nslices-1));
+	map {substr($bar,$slice_length*$_,1,'|')} (1..($nslices-1));
 	# Print
 	printf "\r%-4s [%s]%-.".(length($s))."s","${p}%",$bar,$s;
 EOP
