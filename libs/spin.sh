@@ -37,7 +37,7 @@ function koca_spin {	# Display a spinning cursor or scrolling text. Usage: $0 [ 
 		index=( ${index[@]} $(seq $((n-1)) -1 1) )
 	fi
 	# Display $length car, starting from somewhere 
-	printf "\r%s" "${koca_spin[$spin]:${index[$koca_spin_pos]}:$length}"
+	printf "%s\r" "${koca_spin[$spin]:${index[$koca_spin_pos]}:$length}"
 	# Moving forward in index
 	(( koca_spin_pos=(koca_spin_pos+1)%${#index[@]} ))
 	# Mmm...
