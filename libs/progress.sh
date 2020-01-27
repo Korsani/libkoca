@@ -1,5 +1,4 @@
 function koca_progress {    # Display a non blocking not piped progress. Usage: $0 <progress%> <string> [ <int> ]
-	local COLUMNS=$(tput cols)
 	LANG=C  		        # avoid ./, mistake
 	local progress="$1" ;[[ $progress =~ ^[0-9]+$ ]] || return 1; [ $progress -gt 100 ] && return 2
 	local suf="$2" 
