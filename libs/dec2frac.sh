@@ -4,7 +4,7 @@ function koca_dec2frac {	# Return fraction form of a decimal number. Usage: $0 <
 	# Choose the gnu bc
 	declare -A bc
 	bc['Linux']='/usr/bin/bc'
-	bc['Darwin']='/usr/bin/bc'
+	bc['Darwin']='/usr/local/opt/bc/bin/bc'
 	bc['FreeBSD']='/usr/local/bin/bc'
 	os=$(uname)
 	${bc[$os]} --version | grep -q 'Free Software' || (echo 'Not GNU bc' && exit)
