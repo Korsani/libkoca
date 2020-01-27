@@ -32,11 +32,4 @@ function s2dhms {	# Convert seconds to day hour min sec, or xx:xx:xx if -I. Usag
 		if(w<10) print 0;print w;
 	}
 	"|bc
-	#tot=${sdw}${shw}${smw}${sw}
-	#if [ -z "$tot" ]
-	#then
-#		echo $z_tot
-#	else
-#		echo $tot
-#	fi
 }
