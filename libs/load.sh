@@ -1,6 +1,7 @@
 # Return true is load is less or equal to value
 function koca_load() { # Return true if load is less or equals to specified float value. Usage: $0 <float>
 	local thr="$1"
+	[ -z "$thr" ] && return 3
 	# Shamelessly stolen from: https://bash.cyberciti.biz/monitoring/monitor-unix-linux-system-load/
 	local OS="$(uname)"
 	declare -A ftext; local ftext
