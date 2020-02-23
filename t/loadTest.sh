@@ -14,5 +14,7 @@ testload() {
 	assertTrue "I should be overloaded" "$r"
 	koca_load .01 ; r=$?
 	assertFalse "Load should accept .xx form" "$r"
+	koca_load ; r=$?
+	assertFalse "Load should return false" "$r"
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh

@@ -21,7 +21,7 @@ then
     echo "List all the functions that can be imported :"
     echo " $ $me list"
     echo "Import only some functions :"
-	echo " $ eval \"\$(sh $me function [ function [ ... ] ])\""
+	echo " $ eval \"\$(bash $me function [ function [ ... ] ])\""
 	echo " Don't forget \" around !"
     exit
 fi
