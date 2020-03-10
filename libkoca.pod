@@ -190,7 +190,7 @@ Usage:
 
 B<n> is the progress, in %
 
-B<string> is a an arbitrary string you want to put after the progress bar.
+B<string> is a an arbitrary string you want to put after the progress bar. This can contain unicode symbols. But in that case the string will not take the full space.
 
 B<parts> is the number of slices you want the bar to have. Default to 2
 
@@ -273,9 +273,11 @@ Examples:
 
 Give the value of a key in an section.key=value file (a.k.a. 'properties' file).
 
+If value is not found, <default value> is returned.
+
 Usage:
 
-	KOCA_CONF='/path/to/conf.file' getConfValue <section> <key>
+	KOCA_CONF='/path/to/conf.file' getConfValue <section> <key> [ <default value> ]
 
 Example:
 
