@@ -11,7 +11,7 @@ function koca_b2gmk {	# Convert byte to giga, mega, kilo (tera, peta). Usage: $0
 	symbols=(. k M G T P ) # Eo, Zo and Yo are too big. 'o' is for alignment
 	for i in $(seq ${#symbols[*]})
 	do
-		values[$i]="$(echo 1024^$i|bc)"
+		values[$i]="$(echo "1024^$i"|bc)"
 	done
 	for i in $(seq ${#symbols[*]} -1 1)
 	do

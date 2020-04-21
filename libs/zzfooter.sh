@@ -7,7 +7,7 @@ me="$(basename -- "$0")"
 libname='__libname__'
 # exit if I'am sourced from a shell
 [ "$me" == "$libname" ] || exit 0
-here="$(cd "$(dirname "$0")" ; pwd)"
+here="$(dirname "$0")"
 # full path to me
 fp2me="${here}/$me"
 if [ $# -eq 0 ]
@@ -28,7 +28,7 @@ while [ "$1" != "" ]
 do
 	# Print code of the function
 	# plus linking
-	[ "$(type -t $1)" == "function" ] && type -a "$1" | sed -e "s#__libkoca__#$fp2me#g" | tail -n +2
+	[ "$(type -t "$1")" == "function" ] && type -a "$1" | sed -e "s#__libkoca__#$fp2me#g" | tail -n +2
 	shift
 done
 )
