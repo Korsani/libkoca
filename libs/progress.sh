@@ -23,6 +23,8 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	my $arrow=$narrow==0?'':substr($chars,$narrow,1);
 	$bar.=$arrow;
 	$bar.=' 'x(((100-$p)*$scale));
+	# Adding clr_eol sequence (in case of)
+	$bar.="\e[K";
 	my $slice_length=length($bar)/$nslices;
 	# Put the | on the bar
 	#map {substr($bar,$slice_length*$_,1,'|')} (1+int($p_scaled/$slice_length)..($nslices-1));
