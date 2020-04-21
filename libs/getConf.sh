@@ -33,7 +33,7 @@ function getConfValue {	# Get a the value corresponding to a key from a conf fil
 	local src;src='__libkoca__' ; [ -e "$src" ] && eval "$(bash "$src" _getConfGetSedOption _getConfIsReadable)"
 	local opt;opt="-$(_getConfGetSedOption)e"
 	_getConfIsReadable || return $?
-	local val;val="$(grep -Eh "^$1\.$2[[:space:]]*=" "$KOCA_CONF" 2>/dev/null | sed ${opt} 's/[^=*]+=[[:space:]]*//'| tail -1)"
+	local val;val="$(grep -Eh "^$1\.$2[[:space:]]*=" "$KOCA_CONF" 2>/dev/null | sed "${opt}" 's/[^=*]+=[[:space:]]*//'| tail -1)"
 	[ -n "$val" ] && echo "$val" && return 0
 	[ -n "$3" ] && echo "$3" && return 0
 	return 2

@@ -32,10 +32,11 @@ function koca_spin {	# Display a spinning cursor or scrolling text. Usage: $0 [ 
 	[ "$dir" -eq 0 ] && a=1	# Deal with that case later
 	# Build index of position from where to write
 	# Nii... Make first term to 0 when a=1, n when a=-1
-	index=( $(seq $((a*n*(a-1)/2)) $a $((n-a*n*(a-1)/2)) ) )
+	readarray index <<<$(seq "$(( a*n*(a-1)/2 ))" "$a" "$(( n-a*n*(a-1)/2 ))" )
 	if [ "$dir" -eq 0 ] 		# Bouncing: generate the same sequence, backward, starting from n-1, till 1 (as sequence start with 0)
 	then
-		index=( ${index[@]} $(seq $((n-1)) -1 1) )
+		readarray xedni <<<$(seq $((n-1)) -1 1)
+		index+=( "${xedni[@]}" )
 	fi
 	# Display $length car, starting from somewhere 
 	printf "\r%s" "${koca_spin[$spin]:${index[$koca_spin_pos]}:$length}"

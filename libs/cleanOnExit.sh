@@ -18,9 +18,8 @@ function koca_cleanOnExit { # Remove specified file on script exit. Usage: $0 <f
 	local file
 	for file in "$@"
 	do
-		local t
-		t="$(trap -p 0)"
+		local t;t="$(trap -p 0)"
 		[ -n "$t" ] && _oldTrap0="$(echo "$t ;" | sed -e "s/trap -- '\(.*\)' EXIT/\1/")"
-		trap "$_oldTrap0 rm -f \"$file\"" 0
+		trap "$(printf '%s rm -f "%s"' "$_oldTrap0" "$file")" 0
 	done
 }

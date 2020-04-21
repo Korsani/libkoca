@@ -40,10 +40,10 @@ function koca_banner() {	# Display string in a banner way: chars one by one, at 
 	#time (
 	if [[ $str =~ ^@ ]]
 	then
-		cat "${str#@}" | while read -r str
+		while read -r str2
 		do
-			_disp "$str" "$pause"
-		done
+			_disp "$str2" "$pause"
+		done <"${str#@}"
 	else
 		_disp "$str" "$pause"
 	fi

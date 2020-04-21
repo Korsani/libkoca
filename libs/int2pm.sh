@@ -12,7 +12,8 @@ function koca_int2pm { # return +, ++, +++ (or -). Usage: $0 <value> [ <max> [ <
 	[ "$4" == "gauge" ] && GAUGE="y"
 	
 	#if ! ( [[ $MAX =~ ^[0-9]+$ ]] && [[ $val =~ ^-?[0-9]+$ ]] && [[ $LENGTH =~ ^[0-9]+$ ]])
-	if  ! ( { [[ $MAX =~ ^[0-9]+$ ]] && [[ $val =~ ^-?[0-9]+$ ]] ; } && [[ $LENGTH =~ ^[0-9]+$ ]] )
+	#if  ! ( { [[ $MAX =~ ^[0-9]+$ ]] && [[ $val =~ ^-?[0-9]+$ ]] ; } && [[ $LENGTH =~ ^[0-9]+$ ]] )
+	if  ! [[ $MAX =~ ^[0-9]+$ ]] && [[ $val =~ ^-?[0-9]+$ ]] && [[ $LENGTH =~ ^[0-9]+$ ]] 
 	then
 		echo "[${FUNCNAME[0]}] Params should be integers" >&2
 		return 1
