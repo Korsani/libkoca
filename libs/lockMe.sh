@@ -37,7 +37,7 @@ function koca_lockMe { # Lock the calling script with the specified file. Usage:
 			rm -f "$lock"
 		fi
 	fi
-	while [ [ -e "$lock" ] && [ "$n" -le "$to" ] ]
+	while [ -e "$lock" ] && [ "$n" -le "$to" ]
 	do
 		[ "$quiet" -eq 0 ] && echo "[__libname__] An instance is running (pid : $(/bin/cat "$lock"))."
 		[ "$(basename -- "$0")" == "bash" ] && return
@@ -46,7 +46,7 @@ function koca_lockMe { # Lock the calling script with the specified file. Usage:
 		(( n++ ))
 		# boucler plutot que sortir ?
 	done
-	if [ [ "$n" -gt "$to" && [ -e "$lock" ] ]
+	if [ "$n" -gt "$to" ] && [ -e "$lock" ]
 	then
 		[ "$quiet" -eq 0 ] && echo "[__libname__] Timeout on locking. Violently exiting."
 		exit 1
