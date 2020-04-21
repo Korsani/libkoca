@@ -22,12 +22,10 @@ function koca_lockMe { # Lock the calling script with the specified file. Usage:
 	local n=0
 	if [ -s "$lock" ]
 	then
-		# replace the shell by its absolute path (bash -> /bin/bash)
-		c="$(ps -o command=COMMAND "$(cat "$lock")" | grep -v COMMAND | awk '{print $2}' | xargs echo $SHELL )"
-		# Should detect that /bin/bash plop.sh is the same as /bin/bash ./plop.sh
-		if [[ ! "$c" =~ $SHELL" "\.?\/?$0.* ]]
+		c="$(ps -o command= "$(<"$lock")")"
+		if [ -z "$c" ]
 		then
-			[ "$quiet" -eq 0 ] && echo "[__libname__] Stall lock ($c vs $SHELL $0). Removing."
+			[ "$quiet" -eq 0 ] && echo "[__libname__] Removing stall lock"
 			rm -f "$lock"
 		fi
 	else
@@ -39,9 +37,9 @@ function koca_lockMe { # Lock the calling script with the specified file. Usage:
 	fi
 	while [ -e "$lock" ] && [ "$n" -le "$to" ]
 	do
-		[ "$quiet" -eq 0 ] && echo "[__libname__] An instance is running (pid : $(/bin/cat "$lock"))."
+		[ "$quiet" -eq 0 ] && echo "[__libname__] An instance is running (pid : $(<"$lock"))."
 		[ "$(basename -- "$0")" == "bash" ] && return
-		[ $to -eq 0 ] && exit 1
+		[ "$to" -eq 0 ] && exit 1
 		sleep 1
 		(( n++ ))
 		# boucler plutot que sortir ?
