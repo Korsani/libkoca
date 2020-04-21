@@ -12,9 +12,8 @@ here="$(cd "$(dirname "$0")" ; pwd)"
 fp2me="${here}/$me"
 if [ $# -eq 0 ]
 then
-    echo "$me "
     echo "Librairy of useful functions to import in a shell script"
-    echo
+	echo
     echo "Import all the functions :"
     echo " $ . $me"
     echo "List all the functions that can be imported :"
