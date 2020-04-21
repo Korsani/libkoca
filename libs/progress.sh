@@ -1,9 +1,10 @@
+#!/usr/bin/env bash
 function koca_progress {    # Display a non blocking not piped progress. Usage: $0 <progress%> <string> [ <int> ]
-	local COLUMNS=$(tput cols)
+	local COLUMNS;COLUMNS="$(tput cols)"
 	LANG=C  		        # avoid ./, mistake
-	local progress="$1" ;[[ $progress =~ ^[0-9]+$ ]] || return 1; [ $progress -gt 100 ] && return 2
-	local suf="$2" 
-	local NSLICES=${3:-2};[[ $NSLICES =~ ^[0-9]+$ ]] || return 1 
+	local progress;progress="$1" ;[[ $progress =~ ^[0-9]+$ ]] || return 1; [ $progress -gt 100 ] && return 2
+	local suf;suf="$2" 
+	local NSLICES;NSLICES="${3:-2}";[[ $NSLICES =~ ^[0-9]+$ ]] || return 1 
 	# Perl is 3x faster, and much more easier to implement...
 	# -CAS make perl assume ARGV and code are utf8
 	perl -CAS -MEncode - "$progress" "$suf" "$NSLICES" "$COLUMNS" << 'EOP'

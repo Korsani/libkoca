@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Check wether specified file can be found, warn or exit according it's a MAY or a MUST
 # Initialize the variable with the path of the correspondant file, if the file is found
 # Initialize the variable with 'echo <commande>' if the file is not found
@@ -17,7 +18,7 @@ function checkNeededFiles {	# Check wether file can be found. Usage: $0 must|may
 	do
 		case $1 in
 			-q) 		local quiet='yes';;
-			may|must)	type=$1;;
+			may|must)	type="$1";;
 			*)
 				if ! type -p "$1" >/dev/null 2>&1
 				then
@@ -32,14 +33,14 @@ function checkNeededFiles {	# Check wether file can be found. Usage: $0 must|may
                 else
 					if [[ "$1" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]
 					then
-                    	eval export $1=$(which "$1")
+                    	eval export $1="$(which "$1")"
 					else
-						[ -z "$quiet" ] && echo "[__libname__] Var '$1' won't be exported"
+						[ -z "$quiet" ] && printf "[__libname__] Var '%s' won't be exported" "$1"
 					fi
 				fi
 				;;
 		esac
 		shift
 	done
-	return $_ec
+	return "$_ec"
 }
