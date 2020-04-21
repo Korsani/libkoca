@@ -6,6 +6,7 @@ VERSIONFROM=make version
 DESCRIPTION='Useful shell functions'
 MAKEFLAGS += --no-print-directory --silent
 BRANCH="$(shell git rev-parse --abbrev-ref HEAD)"
+SHUNIT=$(shell type -P shunit2)
 
 PREFIX=/usr/local
 MAN_SECTION=3
@@ -21,6 +22,10 @@ FNMODE=0644
 WWW_DIR:=/var/www/files
 LIBS:=$(sort $(wildcard libs/*.sh))
 OUT:=$(addprefix out/,$(notdir $(LIBS)))
+
+ifeq "" "$(SHUNIT)"
+$(warning shunit2 not found. Lib will be built WITHOUT testing)
+endif
 
 .PHONY : version man
 
