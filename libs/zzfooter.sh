@@ -15,11 +15,11 @@ _dump_function() {
 	fi
 }
 _show_version() {
-	printf 'version:%s-%s\n' '%VERSION%' '%BRANCH%'
+	printf 'version:%s\n' '%VERSION%'
 }
 _show_help() {
 	me="$(basename -- "$0")"
-	echo "$me %VERSION%-%BRANCH%"
+	echo "$me %VERSION%"
 	echo
     echo "Librairy of useful functions to import in a shell script"
 	echo

@@ -7,7 +7,7 @@ DESCRIPTION='Useful shell functions'
 MAKEFLAGS += --no-print-directory --silent
 BRANCH="$(shell git rev-parse --abbrev-ref HEAD)"
 SHUNIT=$(shell bash -c "type -P shunit2")
-VERSION=0.1
+VERSION=$(shell git log -1 --pretty=format:"%as")-$(BRANCH)
 
 PREFIX=/usr/local
 MAN_SECTION=3
@@ -45,7 +45,7 @@ $(FN): $(OUT)
 $(OUT): out/%.sh: libs/%.sh t/%Test.sh
 	$(ECHO) -n "Testing $< ... "
 	#bash $(subst .sh,Test.sh,$(subst libs,t,$<)) >/dev/null && cp libs/$(notdir $<) $@ && echo OK
-	bash $(subst .sh,Test.sh,$(subst libs,t,$<)) >/dev/null && sed -e '1d' -e "s/%BRANCH%/$(BRANCH)/" -e "s/%VERSION%/$(VERSION)/" < libs/$(notdir $<) > $@ && echo OK
+	bash $(subst .sh,Test.sh,$(subst libs,t,$<)) >/dev/null && sed -e '1d' -e "s/%VERSION%/$(VERSION)/" < libs/$(notdir $<) > $@ && echo OK
 
 clean: bclean dclean
 	$(info Cleaning)

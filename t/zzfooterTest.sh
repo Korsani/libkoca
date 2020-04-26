@@ -3,6 +3,6 @@
 source $(cd $(dirname "$0") ; pwd)/bootstrap.sh &>/dev/null
 testVersion() {
 	v=$(_show_version| grep 'version:'| cut -d ':' -f 2)
-	assertEquals "v" "%VERSION%-%BRANCH%" "$v"
+	assertEquals "v" "%VERSION%" "$v"
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh
