@@ -4,6 +4,10 @@ libkoca - An (hopefully) useful shell library
 
 =head1 SYNOPSIS
 
+    bash libkoca.sh help
+    bash libkoca.sh list
+    bash libkoca.sh version
+
 Include all the functions in the name space of your script:
 
 	source libkoca.sh
@@ -11,10 +15,6 @@ Include all the functions in the name space of your script:
 Include only some functions:
 
 	eval "$(sh libkoca.sh <function> [ <function> ] ))"
-
-List the functions of the library:
-
-	bash libkoca.sh list
 
 =head1 DESCRIPTION
 
