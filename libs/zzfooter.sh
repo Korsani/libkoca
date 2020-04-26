@@ -49,6 +49,7 @@ _list_functions() {
 # __libname__ will be replaced by the filename
 libname='__libname__'
 # exit if I'am sourced from a shell
+[ "$(basename -- "$0")" == "$libname" ] || exit 0
 if [ $# -eq 0 ]
 then
 	_show_help
