@@ -23,7 +23,6 @@ endif
 
 ifeq "FreeBSD" "$(OS)"
 MAN_DIR:=$(PREFIX)/man/man$(MAN_SECTION)
-MAKE:=gmake
 else
 MAN_DIR:=$(PREFIX)/share/man/man$(MAN_SECTION)
 endif
@@ -36,7 +35,7 @@ endif
 
 .PHONY: version man update
 
-DEFAULT_GOAL: all
+.DEFAULT_GOAL: all
 
 all: $(FN) man
 
