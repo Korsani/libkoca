@@ -13,7 +13,7 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	#my $chars='░▒▓█';
 	my $chars='▏▎▍▌▋▊▉█';
 	my $nchars=length($chars);
-	my $half='½';
+	my $half='/';
 	(my $p, my $s, my $nslices, my $cols)=@ARGV;
 	my $sparse=7+length(encode_utf8($s));
 	my $scale=($cols-$sparse)/100;
