@@ -481,7 +481,14 @@ Usage:
 	koca_spin [<string> [<direction> [<length>]]]
 	koca_spin list
 
-'n' is the spin type, from 0 to 4, included. 0 by default, or if n is greater than 3.
+'n' is the spin type, from 0 to 4, included. 0 by default, or if n is greater than 4.
+
+	0 : /-\|/-\|
+    1 : |>=<|<=>
+    2 : O○·○
+    3 : [{(|)}]
+    4 : .oOo
+
 
 'direction' is 1 (forward), -1 (backward), 0 (bounce)
 
@@ -492,6 +499,16 @@ Usage:
 'list' display all the spinners.
 
 Perhaps you should put 'tput civis' and 'tput cnorm' somewhere around the call to this function, to hide the cursor.
+
+One breath last 12 or 15s. To make things pleasant you can setup the sleep to make a spin cycle last that duration.
+
+Here are the according sleep:
+
+	0 : /-\|/-\| : length: 8.	12=>5/8=0.625s, 15=>4/8=0.5s
+	1 : |>=<|<=> : length: 8.	12=>5/8=0.625s, 15=>4/8=0.5s
+	2 : O○·○ : length: 4.		12=>5/4=1.25s, 15=>4/4=1s
+	3 : [{(|)}] : length: 7		12=>5/7=0.7s, 15=>4/7=0.6s
+	4 : .oOo : length: 4		12=>5/4=1.25s, 15=>4/4=1s
 
 Examples:
 
