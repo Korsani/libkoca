@@ -4,6 +4,10 @@ libkoca - An (hopefully) useful shell library
 
 =head1 SYNOPSIS
 
+    bash libkoca.sh help
+    bash libkoca.sh list
+    bash libkoca.sh version
+
 Include all the functions in the name space of your script:
 
 	source libkoca.sh
@@ -11,10 +15,6 @@ Include all the functions in the name space of your script:
 Include only some functions:
 
 	eval "$(sh libkoca.sh <function> [ <function> ] ))"
-
-List the functions of the library:
-
-	bash libkoca.sh list
 
 =head1 DESCRIPTION
 
@@ -197,9 +197,9 @@ B<parts> is the number of slices you want the bar to have. Default to 2
 Examples:
 
 	# koca_progress 10 "ETA: 10s"
-10%  [######_________________________|________________________________]ETA: 10s
+10%  [######_________________________/________________________________]ETA: 10s
 	# koca_progress 10 "ETA: 10s" 3
-10%  [######______________|_____________________|_____________________]ETA: 10s
+10%  [######______________|__________/__________|_____________________]ETA: 10s
 
 =head2 underSudo
 
@@ -481,7 +481,14 @@ Usage:
 	koca_spin [<string> [<direction> [<length>]]]
 	koca_spin list
 
-'n' is the spin type, from 0 to 3, included. 0 by default, or if n is greater than 3.
+'n' is the spin type, from 0 to 4, included. 0 by default, or if n is greater than 4.
+
+	0 : /-\|/-\|
+    1 : |>=<|<=>
+    2 : O○·○
+    3 : [{(|)}]
+    4 : .oOo
+
 
 'direction' is 1 (forward), -1 (backward), 0 (bounce)
 
@@ -492,6 +499,16 @@ Usage:
 'list' display all the spinners.
 
 Perhaps you should put 'tput civis' and 'tput cnorm' somewhere around the call to this function, to hide the cursor.
+
+One breath last 12 or 15s. To make things pleasant you can setup the sleep to make a spin cycle last that duration.
+
+Here are the according sleep:
+
+	0 : /-\|/-\| : length: 8.	12=>5/8=0.625s, 15=>4/8=0.5s
+	1 : |>=<|<=> : length: 8.	12=>5/8=0.625s, 15=>4/8=0.5s
+	2 : O○·○ : length: 4.		12=>5/4=1.25s, 15=>4/4=1s
+	3 : [{(|)}] : length: 7		12=>5/7=0.7s, 15=>4/7=0.6s
+	4 : .oOo : length: 4		12=>5/4=1.25s, 15=>4/4=1s
 
 Examples:
 

@@ -18,7 +18,7 @@ function koca_int2pm { # return +, ++, +++ (or -). Usage: $0 <value> [ <max> [ <
 		echo "[${FUNCNAME[0]}] Params should be integers" >&2
 		return 1
 	fi
-	if [ "$MAX" -lt 0 ]
+	if [ "$MAX" -lt "0" ]
 	then
 		echo "[${FUNCNAME[0]}] Max ($MAX) should be positive" >&2
 		return 3

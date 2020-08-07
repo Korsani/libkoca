@@ -13,13 +13,11 @@ function koca_lockMe { # Lock the calling script with the specified file. Usage:
 	local bn;bn="$(basename "$0")"
 	if [ -z "$1" ]
 	then
-		local lock="/tmp/${bn}.lock"
+		echo "$src: lacking lock file"
+		return 1
 	else
 		local lock="$1"
 	fi
-	local to=60
-	[ -n "$2" ] && to="$2"
-	local n=0
 	if [ -s "$lock" ]
 	then
 		c="$(ps -o command= "$(<"$lock")")"
@@ -35,19 +33,9 @@ function koca_lockMe { # Lock the calling script with the specified file. Usage:
 			rm -f "$lock"
 		fi
 	fi
-	while [ -e "$lock" ] && [ "$n" -le "$to" ]
-	do
-		[ "$quiet" -eq 0 ] && echo "[__libname__] An instance is running (pid : $(<"$lock"))."
-		[ "$(basename -- "$0")" == "bash" ] && return
-		[ "$to" -eq 0 ] && exit 1
-		sleep 1
-		(( n++ ))
-		# boucler plutot que sortir ?
-	done
-	if [ "$n" -gt "$to" ] && [ -e "$lock" ]
+	if [ -e "$lock" ]
 	then
-		[ "$quiet" -eq 0 ] && echo "[__libname__] Timeout on locking. Violently exiting."
-		exit 1
+		return 1
 	else
 		echo "$$" > "$lock"
 		koca_cleanOnExit "$lock"
