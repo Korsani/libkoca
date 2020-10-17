@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 function koca_banner() {	# Display string in a banner way: chars one by one, at givent speed. Usage: $0 [@]<string> <float>
 	function _disp() {
-		local str;str"$1"
+		local str;str="$1"
 		local pause;pause="$2"
   		for n in $(seq 1 ${#str})
    	 	do
