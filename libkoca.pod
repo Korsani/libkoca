@@ -4,10 +4,6 @@ libkoca - An (hopefully) useful shell library
 
 =head1 SYNOPSIS
 
-    bash libkoca.sh help
-    bash libkoca.sh list
-    bash libkoca.sh version
-
 Include all the functions in the name space of your script:
 
 	source libkoca.sh
@@ -15,6 +11,10 @@ Include all the functions in the name space of your script:
 Include only some functions:
 
 	eval "$(sh libkoca.sh <function> [ <function> ] ))"
+
+List the functions of the library:
+
+	bash libkoca.sh list
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ Default is B<30cps>.
 
 Spaces are not counted when displaying. Than means tha 'a a' and 'aa' will be displayed at the same speed.
 
-Please note that is speed is too fast, or string or file to display too long, or computer too slow time take to display could be longer. For example C<koca_banner @/etc/hosts 1> will not take 1s.
+Please note that is speed is too fast, or string or file to display too long, time take to display could be longer. For example C<koca_banner @/etc/hosts 1> will not take 1s.
 
 Example:
 
@@ -197,9 +197,9 @@ B<parts> is the number of slices you want the bar to have. Default to 2
 Examples:
 
 	# koca_progress 10 "ETA: 10s"
-10%  [######_________________________/________________________________]ETA: 10s
+10%  [######_________________________|________________________________]ETA: 10s
 	# koca_progress 10 "ETA: 10s" 3
-10%  [######______________|__________/__________|_____________________]ETA: 10s
+10%  [######______________|_____________________|_____________________]ETA: 10s
 
 =head2 underSudo
 
@@ -481,14 +481,7 @@ Usage:
 	koca_spin [<string> [<direction> [<length>]]]
 	koca_spin list
 
-'n' is the spin type, from 0 to 4, included. 0 by default, or if n is greater than 4.
-
-	0 : /-\|/-\|
-    1 : |>=<|<=>
-    2 : Oo.o
-    3 : [{(|)}]
-    4 : .oOo
-
+'n' is the spin type, from 0 to 3, included. 0 by default, or if n is greater than 3.
 
 'direction' is 1 (forward), -1 (backward), 0 (bounce)
 
@@ -499,16 +492,6 @@ Usage:
 'list' display all the spinners.
 
 Perhaps you should put 'tput civis' and 'tput cnorm' somewhere around the call to this function, to hide the cursor.
-
-One breath last 12 or 15s. To make things pleasant you can setup the sleep to make a spin cycle last that duration.
-
-Here are the according sleep:
-
-	0 : /-\|/-\| : length: 8.	12=>5/8=0.625s, 15=>4/8=0.5s
-	1 : |>=<|<=> : length: 8.	12=>5/8=0.625s, 15=>4/8=0.5s
-	2 : Oo.o : length: 4.		12=>5/4=1.25s, 15=>4/4=1s
-	3 : [{(|)}] : length: 7		12=>5/7=0.7s, 15=>4/7=0.6s
-	4 : .oOo : length: 4		12=>5/4=1.25s, 15=>4/4=1s
 
 Examples:
 

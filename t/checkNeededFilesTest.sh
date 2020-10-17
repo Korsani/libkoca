@@ -16,7 +16,7 @@ testCNF() {
 	assertEquals "Should return code 3 on 3 failed mixed may and must" "3" "$r"
 	checkNeededFiles may bash ; r=$?
     assertEquals "Should return the path in the variable" "$(which bash)" "$bash"
-	checkNeededFiles may dfghj &>/dev/null ; r=$?
+	checkNeededFiles may dfghj ; r=$?
     assertEquals "Should return the echo in the variable" "echo dfghj" "$dfghj"
 	mess=$(checkNeededFiles -q may dfghj) ; r=$?
     assertEquals "Should return the echo in the variable" "" "$mess"

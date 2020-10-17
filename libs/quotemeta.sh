@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 function koca_quotemeta { # Escape meta character. Usage: $0 <string>
 	local s="$1"
 	# Is it cheating ?

@@ -21,12 +21,12 @@ For example, and not limited to:
 * Convert bytes to kilo/mega/giga/tera/peta bytes (`koca_b2gmk`)
 * and seconds tou day:hour:min:sec, and vice versa (`s2dhms`, `dhms2s`)
 
-And some others, less often useful: check that a string is an IP address, convert seconds to day:hours:minutes:seconds and vice versa, return the path where the scripts is run from, clone a function to an other name, ...
+And some others, less often useful: check that a string is an IPadress, convert seconds to day:hours:minutes:seconds and vice versa, return the path where the scripts is run from, clone a function to an other name, ...
 
 
 ### Prerequisites
 
-bash(1) >= 4, gnu bc(1)
+bash(1) >= 4, bc(1)
 
 ### Installing
 
