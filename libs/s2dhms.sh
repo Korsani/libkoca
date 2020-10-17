@@ -1,10 +1,10 @@
 function s2dhms {	# Convert seconds to day hour min sec, or xx:xx:xx if -I. Usage: $0 <int>
 	if [ "$1" == '-I' ]
 	then
-		FORMAT='I'
+		FORMAT='1'
 		shift
 	else
-		FORMAT='S'
+		FORMAT='0'
 	fi
 	w="$1"
 	[ -z "$w" ] && read w
