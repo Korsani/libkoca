@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 function s2dhms {	# Convert seconds to day hour min sec, or xx:xx:xx if -I. Usage: $0 <int>
 	if [ "$1" == '-I' ]
 	then
@@ -8,44 +7,29 @@ function s2dhms {	# Convert seconds to day hour min sec, or xx:xx:xx if -I. Usag
 		FORMAT=0
 	fi
 	w="$1"
-	[ -z "$w" ] && read -r w
+	[ -z "$w" ] && read w
 	if ! [[ $w =~ ^[0-9]+$ ]]
 	then
 		echo '    NaN    '
 		return
 	fi
-	if [ "$FORMAT" == "I" ] && [ "$w" -ge "8640000" ]
+	if [ "$FORMAT" -eq 1 -a $w -ge 8640000 ]
 	then
 		echo '    OoR    '
 		return
 	fi
-	dw="$(echo "$w/86400" | bc)"   # Day Warning
-	w="$(echo "$w%86400" | bc)"
-	hw="$(echo "$w/3600" | bc)"
-	w="$(echo "$w%3600" | bc)"
-	mw="$(echo "$w/60" | bc)"
-	w="$(echo "$w%60" | bc)"
-	case "$FORMAT" in
-		S) 
-			sdw="$([ "$dw" -ne 0 ] && echo "${dw}d")"    # String Day Warning
-			shw="$([ "$hw" -ne 0 ] && echo "${hw}h")"
-			smw="$([ "$mw" -ne 0 ] && echo "${mw}min")"
-			sw="$([ "$w" -ne 0 ] && echo "${w}s")"
-			z_tot='0s'
-			;;
-		I)
-			sdw="$(printf "%02d:" "${dw}")"
-			shw="$(printf "%02d:" "${hw}")"
-			smw="$(printf "%02d:" "${mw}")"
-			sw="$(printf "%02d" "${w}")"
-			z_tot='00:00:00'
-			;;
-	esac
-	tot="${sdw}${shw}${smw}${sw}"
-	if [ -z "$tot" ]
-	then
-		echo "$z_tot"
-	else
-		echo "$tot"
-	fi
+	echo "f=$FORMAT;dw=$w/86400;w=$w%86400;hw=w/3600;w%=3600;mw=w/60;w%=60;
+	if(f==0) {
+		if(dw!=0) print dw,\"d\";
+		if(hw!=0) print hw,\"h\";
+		if(mw!=0) print mw,\"min\";
+		if(w!=0) print w,\"s\";
+	}
+	if(f==1) {
+		if(dw<10) print 0;print dw;\":\";
+		if(hw<10) print 0;print hw;\":\";
+		if(mw<10) print 0;print mw;\":\";
+		if(w<10) print 0;print w;
+	}
+	"|bc
 }
