@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 function koca_dec2frac {	# Return fraction form of a decimal number. Usage: $0 <float>
 	local n=$1
 	local PRECISION=100

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Return color code in a specified var
 # getColor var[+] color [ [ var[+] ] color [ ... ] ]
 # Ex : getColor r red g green
@@ -14,51 +15,51 @@ function getColor { # Return a specified color code in a specified var. Usage: $
 		return
 	fi
 	#   For almost every uname...
-    local tput_af="setaf"
-    local tput_ab="setab"
-    local bold=bold
-    local reset=sgr0
+    local tput_af;tput_af='setaf'
+    local tput_ab;tput_ab='setab'
+    local bold;bold='bold'
+    local reset;reset='sgr0'
 	# but FreeBSD doesn't use terminfo
 	if [ "$(uname)" == "FreeBSD" ]
 	then
-		tput_af=AF
-		tput_ab=AB
-		bold=md
-		reset=me
+		tput_af='AF'
+		tput_ab='AB'
+		bold='md'
+		reset='me'
 	fi
 	function _getColor {
 	alias echo="echo -n"
-	local _bold=$(tput $bold)
+	local _bold;_bold="$(tput $bold)"
 		case $1 in 
-			black) echo $(tput $tput_af 0);;
-			red) echo $(tput $tput_af 1) ;;
-			green) echo $(tput $tput_af 2) ;;
-			brown) echo $(tput $tput_af 3) ;;
-			blue) echo $(tput $tput_af 4) ;;
-			purple) echo $(tput $tput_af 5) ;;
-			cyan) echo $(tput $tput_af 6) ;;
-			gray) echo $(tput $tput_af 7) ;;
+			black) tput $tput_af 0 ;;
+			red) tput $tput_af 1 ;;
+			green) tput $tput_af 2 ;;
+			brown) tput $tput_af 3 ;;
+			blue) tput $tput_af 4 ;;
+			purple) tput $tput_af 5 ;;
+			cyan) tput $tput_af 6 ;;
+			gray) tput $tput_af 7 ;;
 
-			bgblack) echo $(tput $tput_ab 0);;
-			bgred) echo $(tput $tput_ab 1) ;;
-			bggreen) echo $(tput $tput_ab 2) ;;
-			bgyellow) echo $(tput $tput_ab 3) ;;
-			bgblue) echo $(tput $tput_ab 4) ;;
-			bgpurple) echo $(tput $tput_ab 5) ;;
-			bgcyan) echo $(tput $tput_ab 6) ;;
-			bgwhite) echo $(tput $tput_ab 7) ;;
+			bgblack) tput $tput_ab 0 ;;
+			bgred) tput $tput_ab 1 ;;
+			bggreen) tput $tput_ab 2 ;;
+			bgyellow) tput $tput_ab 3 ;;
+			bgblue) tput $tput_ab 4 ;;
+			bgpurple) tput $tput_ab 5 ;;
+			bgcyan) tput $tput_ab 6 ;;
+			bgwhite) tput $tput_ab 7 ;;
 
-			hiblack) echo $_bold$(_getColor black) ;;
-			hired) echo $_bold$(_getColor red) ;;
-			higreen) echo $_bold$(_getColor green) ;;
-			yellow) echo $_bold$(_getColor brown) ;;
-			hiblue) echo $_bold$(_getColor blue) ;;
-			hipurple) echo $_bold$(_getColor purple) ;;
-			hicyan) echo $_bold$(_getColor cyan) ;;
-			white) echo $_bold$(_getColor gray) ;;
+			hiblack) echo "$_bold$(_getColor black)" ;;
+			hired) echo "$_bold$(_getColor red)" ;;
+			higreen) echo "$_bold$(_getColor green)" ;;
+			yellow) echo "$_bold$(_getColor brown)" ;;
+			hiblue) echo "$_bold$(_getColor blue)" ;;
+			hipurple) echo "$_bold$(_getColor purple)" ;;
+			hicyan) echo "$_bold$(_getColor cyan)" ;;
+			white) echo "$_bold$(_getColor gray)" ;;
 
-			bold) echo $_bold ;;
-			reset) echo $(tput $reset) ;;
+			bold) echo "$_bold" ;;
+			reset) tput $reset ;;
 		esac
 		unalias echo
 	}
@@ -70,13 +71,13 @@ function getColor { # Return a specified color code in a specified var. Usage: $
 
 	if [ "$1" == "list" ]
 	then
-		local r=$(_getColor reset)
+		local r;r="$(_getColor reset)"
 		local i
 		for i in $allcolors
 		do
 			if [ -t 1 ]
 			then
-				echo "$r# $(_getColor $i)$i$r"
+				echo "$r# $(_getColor "$i")$i$r"
 			else
 				echo "# $i"
 			fi
@@ -84,26 +85,26 @@ function getColor { # Return a specified color code in a specified var. Usage: $
 		echo "Usage: getColor var[+] color [ [ var[+] ] color [ ... ] ]"
 		return 0
 	fi
-	[ $(expr ${#*}) -eq 1 ] && echo 'Bad number of arguments' >&2 && return 1
+	[ $# -eq 1 ] && echo 'Wrong arguments number' >&2 && return 1
 	while [ "$1" != "" ]
 	do
-		if ! $(echo "$allcolors" | grep -q " $1 ")
+		if ! (echo "$allcolors" | grep -q " $1 ")
 		then
 			#echo "$1 is not a color, so it's a var"
-			local var=$1
+			local var="$1"
 			augmented=0
 			# If there is a '+' a the end of the var, it should be appended with color code
-			if $(echo $var | grep -E -q '\+$')
+			if ( echo "$var" | grep -E -q '\+$' )
 			then
 				augmented=1
 				# strip the trailing '+'
-				var=${var%%+}
+				var="${var%%+}"
 			fi
-			name=$2
+			name="$2"
 			shift
 		else
 			#echo "$1 is a color"
-			name=$1
+			name="$1"
 			# and the variable should be in (previously set) 'var'
 			augmented=1
 		fi
@@ -112,7 +113,7 @@ function getColor { # Return a specified color code in a specified var. Usage: $
         # \$$(echo $"$var")" is the "variabilized" name of that variable, for example : $a
         # eval echo \$$(echo $"$var")" return the value of that variable. If 'a' contain '1', this should return '1'
 		local _val
-		if [ $augmented -eq 1 ]
+		if [ "$augmented" -eq 1 ]
 		then
 			_val="$(eval echo \$$"$(echo $"${var%%+}")" 2>/dev/null)"
 		else
@@ -120,15 +121,15 @@ function getColor { # Return a specified color code in a specified var. Usage: $
 		fi
         #echo "old value of 'var' is : $val"
 		shift
-        if echo " $allcolors " | grep -q " $name "
+		if ( echo " $allcolors " | grep -q " $name " )
         then
-			eval ${var}=$"$_val"$"\$(_getColor "$name")"
+			eval "${var}"=$"$_val"$"\$(_getColor "$name")"
         else
             if [ -z "$name" ]
             then
-                echo "$FUNCNAME: Missing a color after variable '$var'"
+                printf '%s: Missing a color after variable "%s"' "${FUNCNAME[0]}" "$var"
             else
-                echo "$FUNCNAME: $name is not a valid color. Try '$FUNCNAME list'"
+                printf '%s: %s is not a valid color. Try "%s list"' "${FUNCNAME[0]}" "$name" "${FUNCNAME[0]}"
             fi
             return
         fi
