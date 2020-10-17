@@ -54,7 +54,7 @@ Default is B<30cps>.
 
 Spaces are not counted when displaying. Than means tha 'a a' and 'aa' will be displayed at the same speed.
 
-Please note that is speed is too fast, or string or file to display too long, time take to display could be longer. For example C<koca_banner @/etc/hosts 1> will not take 1s.
+Please note that is speed is too fast, or string or file to display too long, or computer too slow time take to display could be longer. For example C<koca_banner @/etc/hosts 1> will not take 1s.
 
 Example:
 
@@ -485,7 +485,7 @@ Usage:
 
 	0 : /-\|/-\|
     1 : |>=<|<=>
-    2 : O○·○
+    2 : Oo.o
     3 : [{(|)}]
     4 : .oOo
 
@@ -506,7 +506,7 @@ Here are the according sleep:
 
 	0 : /-\|/-\| : length: 8.	12=>5/8=0.625s, 15=>4/8=0.5s
 	1 : |>=<|<=> : length: 8.	12=>5/8=0.625s, 15=>4/8=0.5s
-	2 : O○·○ : length: 4.		12=>5/4=1.25s, 15=>4/4=1s
+	2 : Oo.o : length: 4.		12=>5/4=1.25s, 15=>4/4=1s
 	3 : [{(|)}] : length: 7		12=>5/7=0.7s, 15=>4/7=0.6s
 	4 : .oOo : length: 4		12=>5/4=1.25s, 15=>4/4=1s
 
