@@ -201,6 +201,8 @@ Examples:
 	# koca_progress 10 "ETA: 10s" 3
 10%  [######______________|_____________________|_____________________]ETA: 10s
 
+Tips: you would use `tput civis` and `tput cnorm` to make cursor (in)visible
+
 =head2 underSudo
 
 Return wether the calling script is run under sudo.
