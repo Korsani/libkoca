@@ -182,7 +182,7 @@ Example:
 
 Display a (non blocking) progress bar.
 
-Unlike pv(1), B<koca_progress> do not pipe data from input to output, nor calculate ETA, throughput or such. It act more like dialog(1) B<--mixedgauge>, taking the whole terminal width (blank padding)
+Unlike pv(1), B<koca_progress> do not pipe data from input to output, nor calculate ETA, throughput or such. It act more like dialog(1) B<--mixedgauge>, taking the whole terminal width, blank padding.
 
 Usage:
 
@@ -190,7 +190,7 @@ Usage:
 
 B<n> is the progress, in %
 
-B<string> is a an arbitrary string you want to put after the progress bar. This can contain unicode symbols. But in that case the string will not take the full space.
+B<string> is a an arbitrary string you want to put after the progress bar. This can contain unicode symbols. But in that case the string will not take the full space. If term width is too small, B<string> will be truncated. 
 
 B<parts> is the number of slices you want the bar to have. Default to 2
 
@@ -200,6 +200,7 @@ Examples:
 10%  [######_________________________|________________________________]ETA: 10s
 	# koca_progress 10 "ETA: 10s" 3
 10%  [######______________|_____________________|_____________________]ETA: 10s
+
 
 =head2 underSudo
 
