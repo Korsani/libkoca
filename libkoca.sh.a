@@ -5,7 +5,7 @@
 _outdated() {
     eval alias $1="\"echo '[libkoca.sh] Please use koca_$1, instead of $1'; koca_$1\""
 }
-function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
+function koca_b2gmk {	# Convert byte to giga, mega, kilo (tera, peta). Usage: $0 <integer>
 	w="$1"
 	if ! [[ "$w" =~ ^[0-9]+$ ]]
 	then
@@ -14,11 +14,19 @@ function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
 	fi
 
 	[ -z "$w" ] && read w
-	symbols=(. k M G T P ) # Eo, Zo and Yo are too big. 'o' is for alignment
-	for i in $(seq ${#symbols[*]})
-	do
-		values[$i]=$(echo 1024^$i|bc)
-	done
+	#symbols=(. k M G T P ) # Eo, Zo and Yo are too big. 'o' is for alignment
+	values=( 1 $((1024**1)) $((1024**2)) $((1024**3)) $((1024**4)) $((1024**5)) $((1024**6)) )
+	echo "w=$w;
+	scale=1
+	p=1024^5;if(w>=p) {print w/p;print \"P\";halt};
+	p=1024^4;if(w>=p) {print w/p;print \"T\";halt};
+	p=1024^3;if(w>=p) {print w/p;print \"G\";halt};
+	p=1024^2;if(w>=p) {print w/p;print \"M\";halt};
+	p=1024^1;if(w>=p) {print w/p;print \"k\";halt};
+	p=1;if(w>=p) {scale=0;print w/p;halt};
+	w
+	"|bc
+	return
 	for i in $(seq ${#symbols[*]} -1 1)
 	do
 		if [ $w -ge ${values[$i]} ]
@@ -31,18 +39,57 @@ function koca_b2gmk {	# byte to giga, mega, kilo (tera, peta)
 
 	echo "${w}"
 }
-function koca_banner() {	# Display string in a banner way: chars one by one, at givent speed
-    local str="$1"
-    local speed="$2"
+function koca_banner() {	# Display string in a banner way: chars one by one, at givent speed. Usage: $0 [@]<string> <float>
+	local _disp
+	function _disp() {
+		local str="$1"
+		local pause="$2"
+  		for n in $(seq 1 ${#str})
+   	 	do
+       		echo -en "\r${str:0:$n}"
+			[ "${str:$n:1}" != " " ] && sleep $pause
+    	done
+		echo
+	}
+	# How long a loop take?
+	local w=0; local t_loop=$((time _disp n) 2>&1 | grep real | sed -e 's/.*m\([0-9]*\).\([0-9]*\)s/\1.\2/')
+    local str="$1"		# Can be a string, file and suffixed by @speed
+    local uspeed="$2"	# Speed given by user
+	local speed_cps
+	local str_unspaced
 	[ -z "$str" ] && return 1
-    [ -z "$speed" ] && speed=500
-    w=$(echo "scale=10;1/$speed" | bc)
-    for n in $(seq 0 ${#str})
-    do
-        echo -en "\r${str:0:$n}"
-        sleep $w
-    done
-	echo
+    [ -z "$uspeed" ] && uspeed='30cps'
+	if [[ $str =~ ^@ ]]		# str is a file
+	then
+		str_unspaced=$(cat "${str#@}" | tr -d '[:blank:]')			# As spaces will not be 'waited', I have to build a non-spaced string
+	else
+		str_unspaced=$(echo "$str" | tr -d '[:blank:]')			# As spaces will not be 'waited', I have to build a non-spaced string
+	fi
+	[[ $uspeed =~ ^[0-9]*[\.,]?[0-9]+$ ]] && uspeed="$(echo $uspeed | tr ',' '.')s"			# In s if nothing is given
+	[[ $uspeed =~ ^[0-9]*[\.,]?[0-9]+s$ ]] && speed_cps=$(echo "scale=2;${#str_unspaced}/${uspeed%%s}" | bc)	# Speed is given in seconds. Convert in cps
+	[[ $uspeed =~ ^[0-9]+cps$ ]] && speed_cps=${uspeed%%cps}		# Speed is given in cps
+	if [ -z "$speed_cps" ]
+	then
+		echo "[libkoca.sh] Speed was not given in a suitable form" >&2
+		return 1
+	fi
+	# If calculated pause is less than the duration of the loop, set pause to 0, and... time taken to display will be longer than expected...
+	local pause=$(echo "scale=10;pause=1/$speed_cps;if (pause<$t_loop) 0 else pause-$t_loop" | bc)
+	#local w2=$(echo "scale=10;1/$speed_cps" | bc)
+	#echo "size:${#str_unspaced} speed:${speed_cps}cps loop:$t_loop wait:${w2}s pause:${pause}s r=" $(echo "scale=2;$w2/$t_loop"|bc)
+	#return
+	#time (
+	if [[ $str =~ ^@ ]]
+	then
+		cat "${str#@}" | while read str
+		do
+			_disp "$str" "$pause"
+		done
+	else
+		_disp "$str" "$pause"
+	fi
+	#)
+	return 0
 }
 # Check wether specified file can be found, warn or exit according it's a MAY or a MUST
 # Initialize the variable with the path of the correspondant file, if the file is found
@@ -57,16 +104,13 @@ function koca_banner() {	# Display string in a banner way: chars one by one, at 
 # > checkNeededFiles may conntrack # supposing conntrack is is not installed
 # > $conntrack -D -s 1.1.1.1
 # > conntrack -D -s 1.1.1.1
-function checkNeededFiles {
+function checkNeededFiles {	# Check wether file can be found. Usage: $0 must|may <file>
 	local _ec=0
 	while [ -n "$1" ]
 	do
 		case $1 in
-			-q)
-				local quiet='yes'
-				;;
-			may|must)
-				type=$1;;
+			-q) 		local quiet='yes';;
+			may|must)	type=$1;;
 			*)
 				if ! type -p "$1" >/dev/null 2>&1
 				then
@@ -107,7 +151,7 @@ function checkNeededFiles {
 # $ . plop
 # $ f
 # Le fichier temporaire ne sera jamais effacé
-function koca_cleanOnExit { # Remove specified file on script exit
+function koca_cleanOnExit { # Remove specified file on script exit. Usage: $0 <file>
 	local file
 	for file in "$@"
 	do
@@ -116,13 +160,13 @@ function koca_cleanOnExit { # Remove specified file on script exit
 		trap "$_oldTrap0 rm -f \"$file\"" 0
 	done
 }
-function koca_dec2frac {	# Return fraction form of a decimal number@
+function koca_dec2frac {	# Return fraction form of a decimal number. Usage: $0 <float>
 	local n=$1
 	local PRECISION=100
 	# Choose the gnu bc
 	declare -A bc
 	bc['Linux']='/usr/bin/bc'
-	bc['Darwin']='/usr/bin/bc'
+	bc['Darwin']='/usr/local/opt/bc/bin/bc'
 	bc['FreeBSD']='/usr/local/bin/bc'
 	os=$(uname)
 	${bc[$os]} --version | grep -q 'Free Software' || (echo 'Not GNU bc' && exit)
@@ -156,7 +200,7 @@ function koca_dec2frac {	# Return fraction form of a decimal number@
 	fi
 	return
 }
-function dhms2s {	# day hour min sec to seconds
+function dhms2s {	# Convert a 'day hour min sec' string to seconds. Usage: $0 <string>
 	# can be specified in any order :
 	# 1d1s is the same as 1s1d
 	w=$1
@@ -169,7 +213,7 @@ function dhms2s {	# day hour min sec to seconds
 		echo '-1'
 	fi
 }
-function dieIfNotRoot { # Exit calling script if not running under root
+function dieIfNotRoot { # Exit calling script if not running under root. Usage: $0
 	local src=__libkoca__ ; [ -e $src ] && eval "$(bash $src gotRoot)"
 	! gotRoot && echo "[libkoca.sh] Actually, I should be run as root" && exit 1
 	#! underSudo && echo "[libkoca.sh] Actually, I should be run under sudo" && exit 1
@@ -197,7 +241,7 @@ function gotRoot { # Return wether the calling script is run under root
 #   $a will contain then the code of red, then a star, then the code of reset. Thus, echo "$a plop" will display a red star, followed by the string "plop"
 # getColor list to get available colors. Output is colored only if it is a terminal.
 # Example : getColor _g higreen _re reset _w white _p hipurple _r hired
-function getColor { # Return a specified color code in a specified var
+function getColor { # Return a specified color code in a specified var. Usage: $0 <var>[+] <colorname>. $0 list
 	if [ ! -t 0 ]
 	then
 		return
@@ -208,7 +252,7 @@ function getColor { # Return a specified color code in a specified var
     local bold=bold
     local reset=sgr0
 	# but FreeBSD doesn't use terminfo
-	if [ "$(uname)" = "FreeBSD" ]
+	if [ "$(uname)" == "FreeBSD" ]
 	then
 		tput_af=AF
 		tput_ab=AB
@@ -326,15 +370,9 @@ function getColor { # Return a specified color code in a specified var
 _getConfGetSedOption() {
 	local opt
 	case $(uname -s) in
-        Darwin|FreeBSD)
-        opt=E
-        ;;
-        OpenBSD)
-        opt=''
-        ;;
-        Linux|*)
-        opt=r
-        ;;
+        Darwin|FreeBSD)	opt='E' ;;
+        OpenBSD)        opt='';;
+        Linux|*)		opt='r' ;;
     esac
 	echo $opt
 }
@@ -353,14 +391,14 @@ _getConfIsReadable() {
 }
 # Deprecated
 getConf() {
-	echo "[libkoca.sh)] Please use getConfValue" >&2
+	echo "[libkoca.sh] Please use getConfValue" >&2
 	echo "$(date -u +%Y%m%d%H%M%SZ) : $(cd $(dirname \"$0\") ; pwd)/$(basename \"$0\") : getConf" >> /var/libkoca/stats
 	getConfValue "$*"
 }
 # Return values from a configuration file passed in $KOCA_CONF variable
 # format of conf file : section.key=value
 # Usage : getConfValue <section> <key>
-function getConfValue {
+function getConfValue {	# Get a the value corresponding to a key from a conf file. Usage: $0 <key>
 ## link: ## _getConfGetSedOption ##
 ## link: ## _getConfIsReadable ##
 	# hey hey, dynamic linking :)
@@ -404,7 +442,7 @@ function getConfAllSections {
 	echo $v
 }
 # Return the number converted in +/- scale
-function koca_int2pm { # return +, ++, +++ (or -). <value> [ <max> [ <length> [ 'gauge' [ <sign+><sign-> ] ] ] ]
+function koca_int2pm { # return +, ++, +++ (or -). Usage: $0 <value> [ <max> [ <length> [ 'gauge' [ <sign+><sign-> ] ] ] ]
 	local val="$1"
 	local MAX=3
 	local LENGTH=3
@@ -476,13 +514,14 @@ function koca_int2pm { # return +, ++, +++ (or -). <value> [ <max> [ <length> [ 
 	fi
 	echo $r
 }
-function koca_isBackgrounded() { # Return true if process is backgrounded. Thanks to http://is.gd/4h3fk0
+function koca_isBackgrounded() { # Return true if process is backgrounded. Usage: $0
+	# Thanks to http://is.gd/4h3fk0.
 	case $(ps -o stat= -p $$) in
 		*+*) return 1;;
 		*) return 0;;
 esac
 }
-function isIp { # return true if parameter is an IPv4/IPv6 address
+function isIp { # return true if parameter is an IPv4/IPv6 address. Usage: $0 <string>
 	#echo "$1" | grep -q -E '^[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}$'
 	local isv4=0
 	local isv6=0
@@ -493,29 +532,31 @@ function isIp { # return true if parameter is an IPv4/IPv6 address
 	fi
 	[ $isv4 -eq 0 -o $isv6 -eq 0 ]
 }
-function koca_isNumeric { # return true if parameter is numeric
+function koca_isNumeric { # Return true if parameter is numeric. Usage: $0 <string>
 	[[ $1 =~ ^[+-]*[0-9.]+$ ]]
 }
-function koca_join { # join lines from STDIN with $1
+function koca_join { # join lines from STDIN with $1. Usage: | $0 <string>
 	# Usefulness of this very function is questionable...
 	cat | paste -s -d"$1" -
 }
 # Return true is load is less or equal to value
-function koca_load() { # Return true if load is less or equals to specified float value
-	thr=$1
+function koca_load() { # Return true if load is less or equals to specified float value. Usage: $0 <float>
+	local thr="$1"
+	[ -z "$thr" ] && return 3
 	# Shamelessly stolen from: https://bash.cyberciti.biz/monitoring/monitor-unix-linux-system-load/
-	OS="$(uname)"
-	declare -A ftext
+	local OS="$(uname)"
+	declare -A ftext; local ftext
 	ftext['FreeBSD']='load averages:'
 	ftext['Linux']='load average:'
 	ftext['Darwin']='load average:'
 	if [[ $thr =~ ^-?0?[1-9]*\.?[0-9]*$ ]]
 	then
-		# Uptime is cross-plateform. cat /proc/loadavg is not
+		# Uptime is cross-plateform. cat /proc/loadavg is not. Perl will save us!
 		# LANG=C make '.' the decimal separator
-		return  $(bc <<< "$(LANG=C uptime | awk -F "${ftext[$OS]}" '{ print $2 }' | cut -d, -f1) > $1")
+		u=$(LANG=C uptime | perl -ne 's/.*: (\d+\.\d+).*/$1/;print')
+		return $(echo "$u > $1"|bc) 
 	else
-		echo "[libkoca.sh] '$1' is not a float or int" >&2
+		echo "[libkoca.sh] '$1' is not a float or an int" >&2
 		return 2
 	fi
 }
@@ -526,7 +567,7 @@ function koca_load() { # Return true if load is less or equals to specified floa
 # lockMe [ -q ] <fichier de lock> [ timeout ]
 # -q : sort silencieusement si le timeout expire
 # PS: le fichier ne devrait pas etre un `mktemp`, sinon ca risque pas de marcher cm prevu :)
-function koca_lockMe { # Lock the calling script on the specified file
+function koca_lockMe { # Lock the calling script with the specified file. Usage: $0 <file>
 	local src=__libkoca__ ; [ -e "$src" ] && eval "$(bash "$src" koca_cleanOnExit)"
 	local quiet=0
 	[ "$1" = "-q" ] && quiet=1 && shift
@@ -575,82 +616,110 @@ function koca_lockMe { # Lock the calling script on the specified file
 		return 0
 	fi
 }
-function koca_unlockMe { # unlock
+function koca_unlockMe { # Remove the lock. Usage: $0 <file>
 	rm -f "$1"
-	[ ! -e "$1" ]
+	! [ -a "$1" ]
 }
 # Retourne 1 si le script a été locké par le fonction ci-dessus
 # Retourne 0 sinon
-function koca_isLocked {
-	lock="$1"
-	[ -e "$lock" ] && return 0
+function koca_isLocked {	# Check wether lock exists
+	local lock="$1"
+	[ -a "$lock" ] && return 0
 	return 1
 }
-function koca_quotemeta { # Escape meta character
+function koca_progress {    # Display a non blocking not piped progress. Usage: $0 <progress%> <string> [ <int> ]
+	LANG=C  		        # avoid ./, mistake
+	local progress="$1" ;[[ $progress =~ ^[0-9]+$ ]] || return 1; [ $progress -gt 100 ] && return 2
+	local suf="$2" 
+	local NSLICES=${3:-2};[[ $NSLICES =~ ^[0-9]+$ ]] || return 1 
+	# Perl is 3x faster, and much more easier to implement...
+	# -CAS make perl assume ARGV and code are utf8
+	perl -CAS -MEncode - "$progress" "$suf" "$NSLICES" "$COLUMNS" << 'EOP'
+	use utf8;
+	use Encode qw( encode_utf8 );
+	#my $chars='░▒▓█';
+	my $chars='▏▎▍▌▋▊▉█';
+	my $nchars=length($chars);
+	my $half='/';
+	(my $p, my $s, my $nslices, my $cols)=@ARGV;
+	my $mb_length=length(encode_utf8($s))-length($s);
+	# Space taken by everything but the bar
+	my $text_length=7+length($s)+$mb_length/2;	#Roughly...
+	my $bar_length=$cols-$text_length;
+	$bar_length=$bar_length>3?$bar_length:3;
+	my $scale=($bar_length)/100;
+	# convert progress into char position
+	$p_scaled=($p*$scale);
+	# Build the bar: fill with x plain char
+	my $bar=substr($chars,$nchars-1,1)x(int($p_scaled));
+	my $narrow=$nchars*($p_scaled-int($p_scaled));
+	my $arrow=$narrow==0?'':substr($chars,$narrow,1);
+	$bar.=$arrow;
+	$bar.=' 'x(((100-$p)*$scale));
+	# Adding clr_eol sequence (in case of)
+	#$bar.="\e[K";
+	my $slice_length=length($bar)/$nslices;
+	# Put the | on the bar
+	#map {substr($bar,$slice_length*$_,1,'|')} (1+int($p_scaled/$slice_length)..($nslices-1));
+	map {substr($bar,$slice_length*$_,1,'|')} (1..($nslices-1));
+    substr($bar,length($bar)/2,1,$half);
+	# Print
+	my $suf_length=$cols-(4+2+length($bar)+1);
+	#printf "\r%-4s [%s]\e[K%-.".(length($s))."s","${p}%",$bar,$s;
+	printf "\r%-4s [%s]\e[K%-.".($suf_length)."s","${p}%",$bar,$s;
+EOP
+}
+function koca_quotemeta { # Escape meta character. Usage: $0 <string>
 	local s="$1"
 	# Is it cheating ?
 	echo "$s" | perl  '-ple$_=quotemeta'
 }
-function s2dhms {	# seconds to day hour min sec, or xx:xx:xx if -I. Return NaN or Oor if error
+function s2dhms {	# Convert seconds to day hour min sec, or xx:xx:xx if -I. Usage: $0 <int>
 	if [ "$1" == '-I' ]
 	then
-		FORMAT='I'
+		FORMAT=1
 		shift
 	else
-		FORMAT='S'
+		FORMAT=0
 	fi
-	w=$1
+	w="$1"
 	[ -z "$w" ] && read w
 	if ! [[ $w =~ ^[0-9]+$ ]]
 	then
 		echo '    NaN    '
 		return
 	fi
-	if [ "$FORMAT" == "I" -a $w -ge 8640000 ]
+	if [ "$FORMAT" -eq 1 -a $w -ge 8640000 ]
 	then
 		echo '    OoR    '
 		return
 	fi
-	dw=$(echo "$w/86400" | bc)   # Day Warning
-	w=$(echo "$w%86400" | bc)
-	hw=$(echo "$w/3600" | bc)
-	w=$(echo "$w%3600" | bc)
-	mw=$(echo "$w/60" | bc)
-	w=$(echo "$w%60" | bc)
-	case $FORMAT in
-		S) 
-			sdw=$([ $dw -ne 0 ] && echo "${dw}d")    # String Day Warning
-			shw=$([ $hw -ne 0 ] && echo "${hw}h")
-			smw=$([ $mw -ne 0 ] && echo "${mw}min")
-			sw=$([ $w -ne 0 ] && echo "${w}s")
-			z_tot='0s'
-			;;
-		I)
-			sdw=$(printf "%02d:" ${dw})
-			shw=$(printf "%02d:" ${hw})
-			smw=$(printf "%02d:" ${mw})
-			sw=$(printf "%02d" ${w})
-			z_tot='00:00:00'
-			;;
-	esac
-	tot=${sdw}${shw}${smw}${sw}
-	if [ -z "$tot" ]
-	then
-		echo $z_tot
-	else
-		echo $tot
-	fi
+	echo "f=$FORMAT;dw=$w/86400;w=$w%86400;hw=w/3600;w%=3600;mw=w/60;w%=60;
+	if(f==0) {
+		if(dw!=0) print dw,\"d\";
+		if(hw!=0) print hw,\"h\";
+		if(mw!=0) print mw,\"min\";
+		if(w!=0) print w,\"s\";
+	}
+	if(f==1) {
+		if(dw<10) print 0;print dw;\":\";
+		if(hw<10) print 0;print hw;\":\";
+		if(mw<10) print 0;print mw;\":\";
+		if(w<10) print 0;print w;
+	}
+	"|bc
 }
 #http://is.gd/qQc5ab
-function koca_spin {	# Display a spinning cursor or scrolling text
+function koca_spin {	# Display a spinning cursor or scrolling text. Usage: $0 [ <int|string> [ <-1|0|1> [ <int> ] ] ]. $0 list
 	local spin=${1:-0}
 	local dir=${2:-1}
 	local length=${3:-1}
-	declare -A koca_spin
+	declare -A koca_spin ; local koca_spin
 	koca_spin[0]='/-\|/-\|'
 	koca_spin[1]='|>=<|<=>' 
 	koca_spin[2]='O○·○'
 	koca_spin[3]='[{(|)}]'
+	koca_spin[4]='.oOo'
 	case $spin in
 		[0-9]) ;;
 		 list) for n in ${!koca_spin[*]} ; do echo "$n:${koca_spin[$n]}" ; done ; return ;;
@@ -667,9 +736,9 @@ function koca_spin {	# Display a spinning cursor or scrolling text
 		return 1
 	fi
 	[ $spin -ge ${#koca_spin[*]} ] && spin=0
-	declare -a index
+	declare -a index ; local index
 	# Make equation easier to write
-	a=$dir ; n=${#koca_spin[$spin]}-$length
+	local a=$dir ; local n=${#koca_spin[$spin]}-$length
 	[ $dir -eq 0 ] && a=1	# Deal with that case later
 	# Build index of position from where to write
 	# Nii... Make first term to 0 when a=1, n when a=-1
@@ -679,13 +748,13 @@ function koca_spin {	# Display a spinning cursor or scrolling text
 		index=( ${index[@]} $(seq $((n-1)) -1 1) )
 	fi
 	# Display $length car, starting from somewhere 
-	printf "\r${koca_spin[$spin]:${index[$koca_spin_pos]}:$length}"
+	printf "\r%s" "${koca_spin[$spin]:${index[$koca_spin_pos]}:$length}"
 	# Moving forward in index
 	(( koca_spin_pos=(koca_spin_pos+1)%${#index[@]} ))
 	# Mmm...
 	return 0
 }
-function whereAmI {
+function whereAmI {	# Return the directory where the script reside. Usage: $0
 	pushd . >/dev/null
 	cd $(dirname "$0")
 	pwd
@@ -694,7 +763,7 @@ function whereAmI {
 # Search a given file in path. If not found, search in common locations
 # return true and the full path if found
 # else return false
-function whereIs {
+function whereIs {	# Return the location of a given file by searching in common locations. Usage: $0 <string>
 	local w=$(type -p "$1")
 	[ -n "$w" ] && echo $w && return 0
 	[ -e "$1" ] && echo $1 && return 0
@@ -727,7 +796,7 @@ then
     echo "List all the functions that can be imported :"
     echo " $ $me list"
     echo "Import only some functions :"
-	echo " $ eval \"\$(sh $me function [ function [ ... ] ])\""
+	echo " $ eval \"\$(bash $me function [ function [ ... ] ])\""
 	echo " Don't forget \" around !"
     exit
 fi
