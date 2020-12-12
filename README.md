@@ -26,7 +26,7 @@ And some others, less often useful: check that a string is an IPadress, convert 
 
 ### Prerequisites
 
-bash(1) >= 4, bc(1)
+bash(1) >= 4, GNU bc(1)
 
 ### Installing
 
