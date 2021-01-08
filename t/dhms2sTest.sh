@@ -2,6 +2,8 @@
 # $Id: dhms2s.sh 1128 2012-08-31 15:44:45Z gab $
 source $(cd $(dirname "$0") ; pwd)/bootstrap.sh
 testdhms2s() {
+	d=$(dhms2s 1y)
+	assertEquals "dhms badly parsed" "31556952" "$d"
 	d=$(dhms2s 1d)
 	assertEquals "dhms badly parsed" "86400" "$d"
 	d=$(dhms2s 1h)
