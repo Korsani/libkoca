@@ -9,6 +9,7 @@ testprogress()  {
 	s=$(koca_progress '101' 'a');assertFalse "More than 100%" $?
 	s=$(koca_progress '-1' 'a');assertFalse "Less than 0" $?
 	s=$(koca_progress 'a' 'a');assertFalse "Not a number" $?
+	s=$(COLUMNS=12 koca_progress 10 'zabumeu');[[ $s =~ za$ ]]; assertTrue "String not truncated" $?
 	return
 	# This fails under some terms (or set of local, I don't know), as string length is sometimes equals to term width, sometimes to the number of bytes.
 	# I give up...
@@ -21,7 +22,7 @@ testprogress()  {
 	lf=$(echo "define trunc(x) { auto s; s=scale; scale=0; x=x/1; scale=s; return x };scale=2;s=($COLS-(7+${#suf}))/100;fill=($p*s);if((fill-trunc(fill))>0) {trunc(fill)+1} else {trunc(fill)}"|bc)
 	l=$(echo "1+($COLS-$lf)+3*$lf"|bc)
 	l=$(printf '%.0f' $l)
-	# (that said... when bc will implent int() or round()??
+	# (that said... when bc will implement int() or round()??
 	s=$(koca_progress $p "$suf" 2); echo "$s"; assertEquals "Progress does not take the full length for $p%." "$l" "${#s}"
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh

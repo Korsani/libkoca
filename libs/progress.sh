@@ -14,8 +14,11 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	my $half='/';
 	(my $p, my $s, my $nslices, my $cols)=@ARGV;
 	my $mb_length=length(encode_utf8($s))-length($s);
-	my $sparse=7+length($s)+$mb_length/2;	#Roughtly...
-	my $scale=($cols-$sparse)/100;
+	# Space taken by everything but the bar
+	my $text_length=7+length($s)+$mb_length/2;	#Roughly...
+	my $bar_length=$cols-$text_length;
+	$bar_length=$bar_length>3?$bar_length:3;
+	my $scale=($bar_length)/100;
 	# convert progress into char position
 	$p_scaled=($p*$scale);
 	# Build the bar: fill with x plain char
@@ -32,6 +35,8 @@ function koca_progress {    # Display a non blocking not piped progress. Usage: 
 	map {substr($bar,$slice_length*$_,1,'|')} (1..($nslices-1));
     substr($bar,length($bar)/2,1,$half);
 	# Print
-	printf "\r%-4s [%s]\e[K%-.".(length($s))."s","${p}%",$bar,$s;
+	my $suf_length=$cols-(4+2+length($bar)+1);
+	#printf "\r%-4s [%s]\e[K%-.".(length($s))."s","${p}%",$bar,$s;
+	printf "\r%-4s [%s]\e[K%-.".($suf_length)."s","${p}%",$bar,$s;
 EOP
 }
