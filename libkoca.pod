@@ -485,7 +485,7 @@ Usage:
 	koca_spin [<string> [<direction> [<length>]]]
 	koca_spin list
 
-'n' is the spin type, from 0 to 3, included. 0 by default, or if n is greater than 3.
+'n' is the spin type, from 0 to 5, included. 0 by default, or if n is greater than 5.
 
 'direction' is 1 (forward), -1 (backward), 0 (bounce)
 

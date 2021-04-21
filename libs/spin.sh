@@ -9,6 +9,7 @@ function koca_spin {	# Display a spinning cursor or scrolling text. Usage: $0 [ 
 	koca_spin[2]='O○·○'
 	koca_spin[3]='[{(|)}]'
 	koca_spin[4]='.oOo'
+	koca_spin[5]='⠇⠋⠙⠸⠴⠦'
 	case $spin in
 		[0-9]) ;;
 		 list) for n in ${!koca_spin[*]} ; do echo "$n:${koca_spin[$n]}" ; done ; return ;;
