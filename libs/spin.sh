@@ -20,7 +20,7 @@ function koca_spin {	# Display a spinning cursor or scrolling text. Usage: $0 [ 
 		    *) koca_spin[0]="$1" ; spin=0 ;;
 	esac
 	if [ -n "$demo" ] ; then
-		for i in $(seq 1 $(( ${#koca_spin[$dir]} * 2)) ) ; do
+		while true ; do
 			koca_spin $demo ; sleep 0.5
 		done
 		return
