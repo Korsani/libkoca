@@ -484,6 +484,7 @@ Usage:
 	koca_spin [<n> [<direction> [<length>]]]
 	koca_spin [<string> [<direction> [<length>]]]
 	koca_spin list
+	koca_spin demo <n>
 
 'n' is the spin type, from 0 to 7, included. 0 by default, or if n is greater than 7.
 
@@ -494,6 +495,8 @@ Usage:
 'string' is the text you want to be scrolled.
 
 'list' display all the spinners.
+
+'demo' show a demo for that spinner.
 
 Perhaps you should put 'tput civis' and 'tput cnorm' somewhere around the call to this function, to hide the cursor.
 
