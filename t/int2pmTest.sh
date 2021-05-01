@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# $Id: getColor.sh 1164 2013-01-08 10:15:48Z gab $
 source $(cd $(dirname "$0") ; pwd)/bootstrap.sh
 testReturnGoodResults() {
 	assertEquals "10+" "+" "$(koca_int2pm 10 100)"
@@ -24,7 +23,7 @@ testReturnFalseOnBadParams() {
 	assertFalse "Should have returned false" $(koca_int2pm a 10 2>/dev/null)
 	assertFalse "Should have returned false" $(koca_int2pm 10 a 2>/dev/null)
 	assertFalse "Max should be greater than value" $(koca_int2pm 100 10 2>/dev/null)
-	assertFalse "Max should be >0" $(koca_int2pm 100 -10 2>/dev/null)
+	assertFalse "Max should be greater than 0" $(koca_int2pm 100 -10 2>/dev/null)
 	assertFalse "Gauge doesn't accept negative numbers" $(koca_int2pm -10 100 10 gauge 2>/dev/null)
 }
 source $(cd $(dirname "$0") ; pwd)/footer.sh
