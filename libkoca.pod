@@ -509,6 +509,26 @@ Examples:
 	# Scrolling text
 	$ for i in {1..100} ; do koca_spin '     Please tell me how you are     ' 0 5 ; sleep 0.1 ; done
 
+=head2 koca_verscmp
+
+Compare versions numbers.
+
+Usage:
+
+	koca_verscmp <v1> <op> <v2>
+
+B<v> is version number. It can be x[.y[.z]], or vx[.y[.z]]
+
+B<op> is C<lt>, C<le>, C<eq>, C<ge> or C<gt>
+
+Examples:
+
+	$ koca_verscmp 1.0 gt 2.2.2	# return false
+	$ koca_verscmp 1 eq 2.2.2	# return false
+	$ koca_verscmp 1.0.0 lt 2.2.2	# return true
+	$ koca_verscmp v1 eq v2		# return false
+	$ koca_verscmp v2 ge v1.1	# return true
+
 =head2 whereAmI
 
 Return calling script's location.
