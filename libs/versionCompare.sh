@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 function koca_verscmp {	# version comparison
 	local v1="$1"
 	local op="$2"

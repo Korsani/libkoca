@@ -3,15 +3,14 @@
 source $(cd $(dirname "$0") ; pwd)/bootstrap.sh
 source $here/../libs/cleanOnExit.sh
 # assert <message> <valeur voulue> <valeur retournée>
-export lock=/tmp/$$
-conf=/tmp/test.cfg
+export lock="/tmp/$$"
+conf="/tmp/test.cfg"
 TMPDIR=${TMPDIR:=/tmp}
 oneTimeSetUp() {
 	echo 'global.ssh=plop' > $conf
 }
 testLocking() {
-	koca_lockMe $lock
-	set +x
+	koca_lockMe "$lock"
 	assertTrue 'Lock failed' "$?"
 	koca_unlockMe "$lock"
 }

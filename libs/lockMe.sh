@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Fournit un mechanisme de lock: empeche plusieurs instances 
 # de tourner en meme temps.
 # Efface le lock s'il est vide, ou s'il ne correspond vraisemblablement pas au processus qui essait de le créer
@@ -8,49 +9,44 @@
 function koca_lockMe { # Lock the calling script with the specified file. Usage: $0 <file>
 	local src=__libkoca__ ; [ -e "$src" ] && eval "$(bash "$src" koca_cleanOnExit)"
 	local quiet=0
+	local lock
 	[ "$1" = "-q" ] && quiet=1 && shift
-	if [ -z "$1" ]
-	then
-		local lock=/tmp/$(basename "$0").lock
+	if [ -z "$1" ] ; then
+		lock="/tmp/$(basename "$0").lock"
 	else
-		local lock="$1"
+		lock="$1"
 	fi
-	local to=60
+	local to ; to=60
 	[ -n "$2" ] && to="$2"
-	local n=0
-	if [ -s "$lock" ]
-	then
+	local n ; n=0
+	if [ -s "$lock" ] ; then
 		# replace the shell by its absolute path (bash -> /bin/bash)
-		c=$(ps -o command=COMMAND $(cat "$lock") | grep -v COMMAND | awk '{print $2}' | xargs echo $SHELL )
+		c="$(ps -o command=COMMAND $(cat "$lock") | grep -v COMMAND | awk '{print $2}' | xargs echo $SHELL )"
 		# Should detect that /bin/bash plop.sh is the same as /bin/bash ./plop.sh
-		if [[ ! "$c" =~ $SHELL" "\.?\/?$0.* ]]
-		then
+		if [[ ! "$c" =~ $SHELL" "\.?\/?$0.* ]] ; then
 			[ "$quiet" -eq 0 ] && echo "[__libname__] Stall lock ($c vs $SHELL $0). Removing."
 			rm -f "$lock"
 		fi
 	else
-		if [ -e "$lock" ]
-		then
+		if [ -e "$lock" ] ; then
 			echo "[__libname__] Empty lock $lock. Removing"
 			rm -f "$lock"
 		fi
 	fi
-	while [ -e $lock -a $n -le $to ]
-	do
+	while [ -e "$lock" ] && [ "$n" -le "$to" ] ; do
 		[ "$quiet" -eq 0 ] && echo "[__libname__] An instance is running (pid : $(/bin/cat "$lock"))."
 		[ "$(basename -- "$0")" == "bash" ] && return
-		[ $to -eq 0 ] && exit 1
+		[ "$to" -eq 0 ] && exit 1
 		sleep 1
 		(( n++ ))
 		# boucler plutot que sortir ?
 	done
-	if [ $n -gt $to -a -e $lock ]
-	then
+	if [ "$n" -gt "$to" ] && [ -e "$lock" ] ; then
 		[ "$quiet" -eq 0 ] && echo "[__libname__] Timeout on locking. Violently exiting."
 		exit 1
 	else
-		echo "$$" > $lock
-		koca_cleanOnExit $lock
+		echo "$$" > "$lock"
+		koca_cleanOnExit "$lock"
 		return 0
 	fi
 }

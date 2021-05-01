@@ -1,20 +1,18 @@
+#!/usr/bin/env bash
 function s2dhms {	# Convert seconds to day hour min sec, or xx:xx:xx if -I. Usage: $0 <int>
-	if [ "$1" == '-I' ]
-	then
+	if [ "$1" == '-I' ] ; then
 		FORMAT=1
 		shift
 	else
 		FORMAT=0
 	fi
-	w="$1"
-	[ -z "$w" ] && read w
-	if ! [[ $w =~ ^[0-9]+$ ]]
-	then
+	local w ; w="$1"
+	[ -z "$w" ] && read -r w
+	if ! [[ $w =~ ^[0-9]+$ ]] ; then
 		echo '    NaN    '
 		return
 	fi
-	if [ "$FORMAT" -eq 1 -a $w -ge 8640000 ]
-	then
+	if [ "$FORMAT" -eq 1 ] && [ "$w" -ge 8640000 ] ; then
 		echo '    OoR    '
 		return
 	fi

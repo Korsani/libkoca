@@ -87,24 +87,20 @@ testGetconfReturnOneResultOnAmbiguousRequest() {
 testGetconfReturnAllTheIndexOfASection() {
 	echo 'com.ssh1=one' > $KOCA_CONF
 	echo 'com.ssh2=one' >> $KOCA_CONF
-	echo 'com.ssh3=one' >> /tmp/1
-	val=$(KOCA_CONF="$KOCA_CONF /tmp/1" getConfAllKeys com)
+	val=$(KOCA_CONF="$KOCA_CONF" getConfAllKeys com)
 	ret=$?
-	assertEquals "Not all values have been returned" "ssh1 ssh2 ssh3" "$val"
-	rm -f /tmp/1
+	assertEquals "Not all values have been returned" "ssh1 ssh2" "$val"
 }
 testGetconfReturnAllTheSections() {
 	echo 'com1.ssh1=one' > $KOCA_CONF
 	echo 'com2.ssh2=one' >> $KOCA_CONF
 	echo 'com1.ssh2=*' >> $KOCA_CONF
-	echo 'com3.ssh2=*' >> /tmp/1
 	echo '# toupidou.plop=one' >> $KOCA_CONF
 	echo ' # toupidou.plop=one' >> $KOCA_CONF
 	echo '  # toupidou.plop=one' >> $KOCA_CONF
-	sections=`KOCA_CONF="$KOCA_CONF /tmp/1" getConfAllSections`
+	sections=$(KOCA_CONF="$KOCA_CONF" getConfAllSections)
 	ret=$?
-	assertEquals "Not all sections have been returned" "com1 com2 com3" "$sections"
-	rm -f /tmp/1
+	assertEquals "Not all sections have been returned" "com1 com2" "$sections"
 }
 testGetconfCorrectlyHandleStars() {
 	echo 'a.b=*' > $KOCA_CONF
