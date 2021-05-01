@@ -1,4 +1,3 @@
-#$Id: Makefile 1161 2013-01-03 10:28:56Z gab $
 PROJECT=libkoca.sh
 CATEGORY=autre
 DISTNAME=libkoca
