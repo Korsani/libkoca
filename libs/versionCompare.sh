@@ -10,6 +10,6 @@ function koca_verscmp {	# version comparison
 		eq) [ "$v1" == "$v2" ];;
 		le) [ "$(printf '%s\n%s' "$v1" "$v2" | sort --version-sort | head -1 )" == "$v1" ] || [ "$v1" == "$v2" ];;
 		lt) [ "$(printf '%s\n%s' "$v1" "$v2" | sort --version-sort | head -1 )" == "$v1" ] && [ "$v1" != "$v2" ];;
-		*)  /bin/false;;
+		*)  return 1;;
 	esac
 }
