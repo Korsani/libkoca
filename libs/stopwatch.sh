@@ -3,8 +3,8 @@ function koca_stopwatch {	# Provide a stopwatch
 	local opt; opt="$1"
 	local date
 	case "$(uname -s)" in
-		Linux|Darwin)	date="date";;
-		FreeBSD)		date="gdate";;
+		FreeBSD)	date="gdate";;
+		*)			date="date";;
 	esac
 	if ! $date --version | grep -q GNU ; then
 		return 1
